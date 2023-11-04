@@ -14,7 +14,7 @@ class Ticket {
   final List<int>? problems;
   final List<int>? solutions;
   final LocationData? locationData;
-  bool? enable = true;
+  final String? status;
 
   Ticket(
       {required this.userName,
@@ -28,7 +28,8 @@ class Ticket {
       this.comments,
       this.problems,
       this.solutions,
-      this.locationData});
+      this.locationData,
+      this.status});
 
   factory Ticket.fromJson(Map<String, dynamic> json) {
     //parse the location data
@@ -66,6 +67,7 @@ class Ticket {
       sector: json['sector'],
       place: json['place'],
       createdAt: json['created_at'],
+      status: json['work_status'],
       lastComment:
           json['last_comment'] != null ? json['last_comment']['comment'] : '',
       comments: commentsList,

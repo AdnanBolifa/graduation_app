@@ -1,4 +1,6 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
 import 'package:jwt_auth/screens/ticket_page.dart';
 import 'package:jwt_auth/screens/login.dart';
@@ -39,22 +41,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool isRefreshing = false;
   Future<void> _fetchReports() async {
-    setState(() {
-      isRefreshing = true;
-    });
+    var connectivityResult = await (Connectivity().checkConnectivity());
 
-    try {
-      final users = await ApiService().getReports(context);
+    if (connectivityResult != ConnectivityResult.none) {
       setState(() {
-        ticketList = users;
-        originalList = ticketList;
+        isRefreshing = true;
       });
-    } catch (e) {
-      debugPrint('Error while refreshing data: $e');
-    } finally {
-      setState(() {
-        isRefreshing = false;
-      });
+
+      try {
+        if (context.mounted) {
+          final users = await ApiService().getReports(context);
+          setState(() {
+            ticketList = users;
+            originalList = ticketList;
+          });
+        }
+      } catch (e) {
+        debugPrint('Error while refreshing data: $e');
+      } finally {
+        setState(() {
+          isRefreshing = false;
+        });
+      }
+    } else {
+      Fluttertoast.showToast(msg: 'لايوجد انترنت');
     }
   }
 
@@ -109,10 +119,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   : ListView.builder(
                       itemCount: ticketList.length,
                       itemBuilder: (context, index) {
-                        final isTicketEnabled =
-                            ticketList[index].enable ?? false;
                         return GestureDetector(
-                          onTap: isTicketEnabled
+                          onTap: ticketList[index].status == 'inprogress'
                               ? () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -124,7 +132,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               : null,
                           child: TicketCard(
                             ticket: ticketList[index],
-                            isDisabled: !isTicketEnabled,
                           ),
                         );
                       },

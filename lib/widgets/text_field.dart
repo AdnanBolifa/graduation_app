@@ -40,12 +40,8 @@ Widget textReports(
 }
 
 Widget textField(
-  String label,
-  String hint,
-  TextEditingController onChangedCallback, {
-  double? width,
-  double? height,
-}) {
+    String label, String hint, TextEditingController onChangedCallback,
+    {double? width, double? height, bool? isHide}) {
   return Column(
     children: [
       Directionality(
@@ -54,6 +50,7 @@ Widget textField(
           width: width, // Specify the width if provided
           height: height, // Specify the height if provided
           child: TextField(
+            obscureText: isHide ?? false,
             controller: onChangedCallback,
             decoration: InputDecoration(
               labelText: label,

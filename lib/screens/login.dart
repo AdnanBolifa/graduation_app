@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously
-
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -43,7 +41,8 @@ class _LoginPageState extends State<LoginPage> {
                 height: 25,
               ),
               textField('إسم المستخدم', 'Hello, World', emailController),
-              textField('كلمة المرور', 'sudo su', passwordController),
+              textField('كلمة المرور', 'sudo su', passwordController,
+                  isHide: true),
               ElevatedButton(
                 onPressed: () async {
                   var connectivityResult =

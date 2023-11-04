@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
 import 'package:jwt_auth/screens/home.dart';
+import 'package:jwt_auth/services/api_service.dart';
 
 class SurveyPage extends StatefulWidget {
   final Ticket? ticket;
@@ -20,6 +21,7 @@ class _SurveyPageState extends State<SurveyPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.language),
@@ -98,16 +100,19 @@ class _SurveyPageState extends State<SurveyPage> {
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.all(16.0),
               ),
-              onPressed: () {
-                widget.ticket!.enable = false;
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ),
-                );
+              onPressed: () async {
+                List<String> list = ['a', 'b'];
+                await ApiService().submitSurvey(widget.ticket!.id, list, 2);
+                if (context.mounted) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                    ),
+                  );
+                }
               },
               child: const Text(
-                'Submit',
+                'إرسال',
                 style: TextStyle(fontSize: 18),
               ),
             ),

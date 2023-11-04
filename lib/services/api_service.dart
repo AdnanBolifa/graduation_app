@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/data/api_config.dart';
 import 'package:jwt_auth/data/comment_config.dart';
+import 'package:jwt_auth/data/location_config.dart';
 import 'package:jwt_auth/data/problem_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
 import 'package:jwt_auth/data/solution_config.dart';
@@ -116,6 +117,34 @@ class ApiService {
     return _parseSolutionsResponse(response);
   }
 
+  Future<void> startTimer(LocationData location, int ticket) async {
+    final body = {
+      "long": location.longitude,
+      "lat": location.latitude,
+    };
+    await _performPostRequest('${APIConfig.timer}$ticket/start', body);
+  }
+
+  Future<void> fetchSurvey() async {}
+
+  Future<void> submitSurvey(int id, List<String> answers, int count) async {
+    final List<Map<String, dynamic>> answersList = [];
+
+    for (int i = 1; i <= count; i++) {
+      answersList.add({
+        "question": i,
+        "answer": answers[i - 1],
+      });
+    }
+
+    final body = {
+      "ticket": id,
+      "answers_list": answersList,
+    };
+
+    await _performPostRequest(APIConfig.submitSurvey, body);
+  }
+
   //helper functions
   Future<http.Response> _performGetRequest(String url) async {
     final response = await http.get(Uri.parse(url));
@@ -136,7 +165,7 @@ class ApiService {
         'Content-Type': 'application/json',
       },
     );
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       Fluttertoast.showToast(
         msg: "تمت اضافة البيانات بنجاح!",
         toastLength: Toast.LENGTH_SHORT,
@@ -150,7 +179,7 @@ class ApiService {
         gravity: ToastGravity.BOTTOM,
         textColor: Colors.white,
       );
-      throw Exception('Failed to add data: ${response.statusCode}');
+      throw Exception('Failed to add data: ${response.body}');
     }
   }
 
@@ -195,9 +224,11 @@ class ApiService {
       await authService.getNewAccessToken();
       return _performAuthenticatedGetRequest(url, authService, context);
     } else if (response.statusCode != 200 && context != null) {
-      Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => const LoginPage(),
-      ));
+      if (context.mounted) {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ));
+      }
       authService.logout();
     }
 
