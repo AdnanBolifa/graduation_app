@@ -20,15 +20,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 100,
-              ),
+              const SizedBox(height: 150),
               Image.asset('lib/assets/hti_logo.png'),
               const SizedBox(
                 height: 50,
@@ -70,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                     );
                     await AuthService().storeTokens(token);
                   } catch (e) {
-                    print('Login failed: $e');
+                    throw ('Login failed: $e');
                   }
                 },
                 style: ButtonStyle(

@@ -40,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   bool isRefreshing = false;
+
   Future<void> _fetchReports() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
 

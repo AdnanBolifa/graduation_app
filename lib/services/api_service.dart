@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_auth/data/api_config.dart';
 import 'package:jwt_auth/data/comment_config.dart';
 import 'package:jwt_auth/data/location_config.dart';
+import 'package:jwt_auth/data/multi_survey_config.dart';
 import 'package:jwt_auth/data/problem_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
 import 'package:jwt_auth/data/solution_config.dart';
@@ -122,27 +123,22 @@ class ApiService {
       "long": location.longitude,
       "lat": location.latitude,
     };
-    await _performPostRequest('${APIConfig.timer}$ticket/start', body);
+    await _performPostRequest('${APIConfig.timerUrl}$ticket/start', body);
   }
 
-  Future<void> fetchSurvey() async {}
+  Future<List<MultiSurvey>> fetchSurvey() async {
+    final response = await _performGetRequest(APIConfig.getSurveyUrl);
+    return _parseSurveyResponse(response);
+  }
 
-  Future<void> submitSurvey(int id, List<String> answers, int count) async {
-    final List<Map<String, dynamic>> answersList = [];
-
-    for (int i = 1; i <= count; i++) {
-      answersList.add({
-        "question": i,
-        "answer": answers[i - 1],
-      });
-    }
-
+  Future<void> submitSurvey(
+      int id, List<Map<String, dynamic>> answersList) async {
     final body = {
       "ticket": id,
       "answers_list": answersList,
     };
-
-    await _performPostRequest(APIConfig.submitSurvey, body);
+    print(jsonEncode(body));
+    await _performPostRequest(APIConfig.submitSurveyUrl, body);
   }
 
   //helper functions
@@ -174,7 +170,7 @@ class ApiService {
       );
     } else {
       Fluttertoast.showToast(
-        msg: "لم تمت عملية الاضافة!",
+        msg: "لم تتم عملية الاضافة!",
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
         textColor: Colors.white,
@@ -267,6 +263,20 @@ class ApiService {
 
       final solutions = results.map((item) => Solution.fromJson(item)).toList();
       return solutions;
+    } else {
+      throw Exception('Failed to fetch solutions');
+    }
+  }
+
+  List<MultiSurvey> _parseSurveyResponse(http.Response response) {
+    if (response.statusCode == 200) {
+      final responseMap = jsonDecode(utf8.decode(response.bodyBytes));
+      final List<dynamic> results = responseMap['results'];
+      //todo
+      //int count = responseMap['count'] as int;
+
+      final survey = results.map((item) => MultiSurvey.fromJson(item)).toList();
+      return survey;
     } else {
       throw Exception('Failed to fetch solutions');
     }
