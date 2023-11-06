@@ -35,8 +35,11 @@ class _HomeScreenState extends State<HomeScreen> {
       if (query.isEmpty) {
         ticketList = List.from(originalList);
       } else {
-        ticketList = ticketList.where((ticket) {
-          return ticket.userName.toLowerCase().contains(query.toLowerCase());
+        ticketList = originalList.where((ticket) {
+          final queryLower = query.toLowerCase();
+          return ticket.userName.toLowerCase().contains(queryLower) ||
+              ticket.mobile.toLowerCase().contains(queryLower) ||
+              ticket.acc!.toLowerCase().contains(queryLower);
         }).toList();
       }
     });
@@ -149,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       controller: searchController,
                       onChanged: _filterUsers,
                       decoration: InputDecoration(
+                        hintTextDirection: TextDirection.rtl,
                         hintText: 'البحث عن كل شيء',
                         labelText: 'بحث',
                         border: OutlineInputBorder(
