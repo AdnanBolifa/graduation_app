@@ -77,7 +77,7 @@ class ApiService {
     }
   }
 
-  Future<List<Ticket>> getReports(context) async {
+  Future<List<Ticket>?> getReports(context) async {
     final authService = AuthService();
 
     final response = await _performAuthenticatedGetRequest(
@@ -98,7 +98,7 @@ class ApiService {
       debugPrint('Response content: ${response.body}');
     }
 
-    return [];
+    return null;
   }
 
   Future<List<Problem>> fetchProblems() async {

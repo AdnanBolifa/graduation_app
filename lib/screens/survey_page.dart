@@ -1,5 +1,8 @@
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/data/multi_survey_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
 import 'package:jwt_auth/screens/home.dart';
@@ -15,6 +18,8 @@ class SurveyPage extends StatefulWidget {
 
 class _SurveyPageState extends State<SurveyPage> {
   int selectedRating = 0;
+  bool hasError = false;
+
   Map<int, int> questionRatings = {};
   List<String> answers = [];
   List<MultiSurvey> survey = [];
@@ -26,11 +31,37 @@ class _SurveyPageState extends State<SurveyPage> {
     _getSurvey();
   }
 
-  Future<void> _getSurvey() async {
-    final multi = await ApiService().fetchSurvey();
+  void _handleError() {
     setState(() {
-      survey = multi;
+      hasError = true;
     });
+  }
+
+  void _retryFetchingData() {
+    // Clear the error flag and attempt to fetch data again.
+    setState(() {
+      hasError = false;
+    });
+    _getSurvey();
+  }
+
+  Future<void> _getSurvey() async {
+    try {
+      final multi = await ApiService().fetchSurvey();
+      setState(() {
+        survey = multi;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching survey data: $e");
+      }
+      _handleError();
+    }
+  }
+
+  Future<bool> checkInternetConnectivity() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult != ConnectivityResult.none;
   }
 
   @override
@@ -41,129 +72,185 @@ class _SurveyPageState extends State<SurveyPage> {
         title: const Text('الاستبيان'),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Directionality(
-          textDirection: TextDirection.rtl,
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                for (int i = 0; i < survey.length; i++)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8, right: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${survey[i].question}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+      body: hasError
+          ? Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Text(
+                      "حدث عطل ما!",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          _retryFetchingData();
+                        },
+                        child: const Text('حاول مجددا'))
+                  ],
+                ),
+              ),
+            )
+          : FutureBuilder(
+              future: checkInternetConnectivity(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError || snapshot.data == false) {
+                  // No internet connection
+                  return Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          const Text(
+                            "لا يوجد اتصال بالانترنت",
+                            style: TextStyle(fontSize: 16),
                           ),
-                        ),
-                        Wrap(
-                          children: [
-                            for (int j = 0; j < survey[i].answers!.length; j++)
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  buildRadio(i, j),
-                                  Text(
-                                    survey[i].answers![j].text,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                          ElevatedButton(
+                              onPressed: () {
+                                _retryFetchingData();
+                              },
+                              child: const Text('حاول مجددا'))
+                        ],
+                      ),
+                    ),
+                  );
+                } else {
+                  return SingleChildScrollView(
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            for (int i = 0; i < survey.length; i++)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 8, right: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${survey[i].question}',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Wrap(
+                                      children: [
+                                        for (int j = 0;
+                                            j < survey[i].answers!.length;
+                                            j++)
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              buildRadio(i, j),
+                                              Text(
+                                                survey[i].answers![j].text,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                      ],
+                                    ),
+                                    //todo 2v make all the fields required
+                                    if (survey[i].type == 'rating')
+                                      Center(
+                                        child: RatingBar.builder(
+                                          initialRating:
+                                              selectedRating.toDouble(),
+                                          minRating: 1,
+                                          direction: Axis.horizontal,
+                                          allowHalfRating: false,
+                                          itemCount: 5,
+                                          itemPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 4.0),
+                                          itemBuilder: (context, _) =>
+                                              const Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                          ),
+                                          onRatingUpdate: (rating) {
+                                            setState(() {
+                                              selectedRating = rating.toInt();
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    const SizedBox(height: 10),
+                                    if (survey[i].type == 'text')
+                                      TextFormField(
+                                        controller: notes,
+                                        maxLines: 4,
+                                        decoration: const InputDecoration(
+                                          hintText: 'اضف ملاحظاتك',
+                                          border: OutlineInputBorder(),
+                                          contentPadding: EdgeInsets.all(12.0),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
+                            const SizedBox(height: 20.0),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.all(16.0),
+                              ),
+                              onPressed: () async {
+                                List<Map<String, dynamic>> answersList = [];
+
+                                for (int i = 0; i < survey.length; i++) {
+                                  if (questionRatings.containsKey(i)) {
+                                    int answer = questionRatings[i]!;
+                                    answersList.add({
+                                      "question": survey[i].id,
+                                      "answer": answer,
+                                    });
+                                  }
+                                  if (survey[i].type == 'rating') {
+                                    answersList.add({
+                                      "question": survey[i].id,
+                                      "answer": selectedRating,
+                                    });
+                                  }
+                                  if (survey[i].type == 'text') {
+                                    answersList.add({
+                                      "question": survey[i].id,
+                                      "answer": notes.text,
+                                    });
+                                  }
+                                }
+                                //?if you want all the feilds required uncoomment this
+                                //answersList.length == survey.length
+                                if (answersList.isEmpty || notes.text.isEmpty) {
+                                  Fluttertoast.showToast(
+                                      msg: 'الرجاء تعبئة الحقول');
+                                  return;
+                                }
+                                await ApiService().submitSurvey(
+                                    widget.ticket!.id, answersList);
+                                if (context.mounted) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const HomeScreen()));
+                                }
+                              },
+                              child: const Text(
+                                'إرسال',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
                           ],
                         ),
-                        //todo 2v make all the fields required
-                        if (survey[i].type == 'rating')
-                          Center(
-                            child: RatingBar.builder(
-                              initialRating: selectedRating.toDouble(),
-                              minRating: 1,
-                              direction: Axis.horizontal,
-                              allowHalfRating: false,
-                              itemCount: 5,
-                              itemPadding:
-                                  const EdgeInsets.symmetric(horizontal: 4.0),
-                              itemBuilder: (context, _) => const Icon(
-                                Icons.star,
-                                color: Colors.amber,
-                              ),
-                              onRatingUpdate: (rating) {
-                                setState(() {
-                                  selectedRating = rating.toInt();
-                                });
-                              },
-                            ),
-                          ),
-                        const SizedBox(height: 10),
-                        if (survey[i].type == 'text')
-                          TextFormField(
-                            controller: notes,
-                            maxLines: 4,
-                            decoration: const InputDecoration(
-                              hintText: 'اضف ملاحظاتك',
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.all(12.0),
-                            ),
-                          ),
-                      ],
+                      ),
                     ),
-                  ),
-                const SizedBox(height: 20.0),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.all(16.0),
-                  ),
-                  onPressed: () async {
-                    List<Map<String, dynamic>> answersList = [];
-
-                    for (int i = 0; i < survey.length - 2; i++) {
-                      if (questionRatings.containsKey(i)) {
-                        int answer = questionRatings[i]!;
-                        answersList.add({
-                          "question": survey[i].id,
-                          "answer": answer,
-                        });
-                      } else {
-                        String answer = answers[i];
-                        answersList.add({
-                          "question": survey[i].id,
-                          "answer": answer,
-                        });
-                      }
-                    }
-                    answersList.add({
-                      "question": survey[survey.length - 2].id,
-                      "answer": selectedRating,
-                    });
-                    answersList.add({
-                      "question": survey[survey.length - 1].id,
-                      "answer": notes.text,
-                    });
-                    await ApiService()
-                        .submitSurvey(widget.ticket!.id, answersList);
-                    if (context.mounted) {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const HomeScreen()));
-                    }
-                  },
-                  child: const Text(
-                    'إرسال',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-              ],
+                  );
+                }
+              },
             ),
-          ),
-        ),
-      ),
     );
   }
 

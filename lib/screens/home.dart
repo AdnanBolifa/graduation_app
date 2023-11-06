@@ -20,6 +20,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController searchController = TextEditingController();
   List<Ticket> ticketList = [];
   List<Ticket> originalList = [];
+  bool isRefreshing = false;
+  bool noInternet = false;
+  bool hasError = false;
 
   @override
   void initState() {
@@ -39,34 +42,59 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  bool isRefreshing = false;
-
   Future<void> _fetchReports() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
 
     if (connectivityResult != ConnectivityResult.none) {
       setState(() {
         isRefreshing = true;
+        noInternet = false;
       });
 
       try {
         if (context.mounted) {
           final users = await ApiService().getReports(context);
-          setState(() {
-            ticketList = users;
-            originalList = ticketList;
-          });
+          if (users != null) {
+            setState(() {
+              ticketList = users;
+              originalList = ticketList;
+            });
+          } else {
+            _handleError();
+            throw Exception('ApiService returned null or an error response.');
+          }
         }
       } catch (e) {
         debugPrint('Error while refreshing data: $e');
+        // Set a flag to indicate an error occurred.
+        _handleError();
       } finally {
         setState(() {
           isRefreshing = false;
         });
       }
     } else {
+      setState(() {
+        noInternet = true;
+      });
       Fluttertoast.showToast(msg: 'لايوجد انترنت');
+      // Set a flag to indicate an error occurred.
+      _handleError();
     }
+  }
+
+  void _handleError() {
+    setState(() {
+      hasError = true;
+    });
+  }
+
+  void _retryFetchingData() {
+    // Clear the error flag and attempt to fetch data again.
+    setState(() {
+      hasError = false;
+    });
+    _fetchReports();
   }
 
   @override
@@ -93,54 +121,72 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: _fetchReports,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: searchController,
-                onChanged: _filterUsers,
-                decoration: InputDecoration(
-                  hintText: 'البحث عن كل شيء',
-                  labelText: 'بحث',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+      body: noInternet || hasError
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    noInternet
+                        ? "لا يوجد اتصال بالإنترنت"
+                        : "An error occurred",
+                    style: const TextStyle(fontSize: 18),
                   ),
-                  prefixIcon: const Icon(Icons.search),
-                ),
+                  ElevatedButton(
+                    onPressed: _retryFetchingData,
+                    child: const Text("حاول مرة أخرى"),
+                  ),
+                ],
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _fetchReports,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: _filterUsers,
+                      decoration: InputDecoration(
+                        hintText: 'البحث عن كل شيء',
+                        labelText: 'بحث',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        prefixIcon: const Icon(Icons.search),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ticketList.isEmpty
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : ListView.builder(
+                            itemCount: ticketList.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: ticketList[index].status == 'inprogress'
+                                    ? () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => AddTicket(
+                                                ticket: ticketList[index]),
+                                          ),
+                                        );
+                                      }
+                                    : null,
+                                child: TicketCard(
+                                  ticket: ticketList[index],
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
             ),
-            Expanded(
-              child: ticketList.isEmpty
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : ListView.builder(
-                      itemCount: ticketList.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: ticketList[index].status == 'inprogress'
-                              ? () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          AddTicket(ticket: ticketList[index]),
-                                    ),
-                                  );
-                                }
-                              : null,
-                          child: TicketCard(
-                            ticket: ticketList[index],
-                          ),
-                        );
-                      },
-                    ),
-            )
-          ],
-        ),
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
