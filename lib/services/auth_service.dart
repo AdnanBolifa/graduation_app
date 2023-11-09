@@ -20,8 +20,11 @@ class AuthService {
 
     if (response.statusCode == 200) {
       return response.body;
+    } else if (response.statusCode == 401) {
+      Fluttertoast.showToast(msg: 'بيانات خاطئة!');
+      throw Exception('Failed to log in: ${response.statusCode}');
     } else {
-      Fluttertoast.showToast(msg: 'حدث خطأ');
+      Fluttertoast.showToast(msg: 'حدث خطأ ما!');
       throw Exception('Failed to log in: ${response.statusCode}');
     }
   }

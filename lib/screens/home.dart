@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isRefreshing = false;
   bool noInternet = false;
   bool hasError = false;
+  bool noTickets = false;
 
   @override
   void initState() {
@@ -39,7 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
           final queryLower = query.toLowerCase();
           return ticket.userName.toLowerCase().contains(queryLower) ||
               ticket.mobile.toLowerCase().contains(queryLower) ||
-              ticket.acc!.toLowerCase().contains(queryLower);
+              ticket.acc!.toLowerCase().contains(queryLower) ||
+              ticket.place!.toLowerCase().contains(queryLower);
         }).toList();
       }
     });
@@ -57,11 +59,13 @@ class _HomeScreenState extends State<HomeScreen> {
       try {
         if (context.mounted) {
           final users = await ApiService().getReports(context);
-          if (users != null) {
+          if (users != null && users.isNotEmpty) {
             setState(() {
               ticketList = users;
               originalList = ticketList;
             });
+          } else if (users!.isEmpty) {
+            _noTickets();
           } else {
             _handleError();
             throw Exception('ApiService returned null or an error response.');
@@ -92,14 +96,22 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _noTickets() {
+    setState(() {
+      noTickets = true;
+    });
+  }
+
   void _retryFetchingData() {
     // Clear the error flag and attempt to fetch data again.
     setState(() {
       hasError = false;
+      noTickets = false;
     });
     _fetchReports();
   }
 
+  //todo fix the bug when there's no ticket assigned
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,20 +136,26 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: noInternet || hasError
+      body: noInternet || hasError || noTickets
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    noInternet
-                        ? "لا يوجد اتصال بالإنترنت"
-                        : "An error occurred",
-                    style: const TextStyle(fontSize: 18),
+                    noTickets
+                        ? "😎 لا يوجد لديك اي بلاغ "
+                        : noInternet
+                            ? "لا يوجد اتصال بالإنترنت"
+                            : "An error occurred",
+                    style: const TextStyle(fontSize: 22),
                   ),
+                  const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: _retryFetchingData,
-                    child: const Text("حاول مرة أخرى"),
+                    child: const Text(
+                      "إعادة المحاولة",
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ],
               ),

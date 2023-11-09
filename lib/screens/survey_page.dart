@@ -153,7 +153,6 @@ class _SurveyPageState extends State<SurveyPage> {
                                           ),
                                       ],
                                     ),
-                                    //todo 2v make all the fields required
                                     if (survey[i].type == 'rating')
                                       Center(
                                         child: RatingBar.builder(
@@ -225,7 +224,7 @@ class _SurveyPageState extends State<SurveyPage> {
                                 }
                                 //?if you want all the feilds required uncoomment this
                                 //answersList.length == survey.length
-                                if (answersList.isEmpty || notes.text.isEmpty) {
+                                if (answersList.isEmpty) {
                                   Fluttertoast.showToast(
                                       msg: 'الرجاء تعبئة الحقول');
                                   return;

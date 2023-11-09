@@ -152,6 +152,8 @@ class TicketCard extends StatelessWidget {
                                                       'هل انت متأكد من بدأ المهمة؟',
                                                       textAlign:
                                                           TextAlign.right,
+                                                      style: TextStyle(
+                                                          fontSize: 16),
                                                     ),
                                                   ),
                                                 ],

@@ -47,8 +47,8 @@ Widget textField(
       Directionality(
         textDirection: TextDirection.rtl,
         child: SizedBox(
-          width: width, // Specify the width if provided
-          height: height, // Specify the height if provided
+          width: width,
+          height: height,
           child: TextField(
             obscureText: isHide ?? false,
             controller: onChangedCallback,

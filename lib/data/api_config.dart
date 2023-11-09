@@ -1,5 +1,8 @@
 class APIConfig {
-  static const String baseUrl = 'http://165.16.36.4:8877/api/';
+  static const String baseUrl = 'http://165.16.36.4:8015/api/';
+
+  //* Testing
+  //static const String baseUrl = 'http://165.16.36.4:8877/api/';
 
   static const String vipPath = 'vip/';
   static const String ticketPath = 'ticket/';
