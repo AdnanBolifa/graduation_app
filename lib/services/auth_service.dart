@@ -12,16 +12,17 @@ class AuthService {
     if (email.isEmpty || password.isEmpty) {
       throw ArgumentError('Email and password must not be empty');
     }
-
     final response = await http.post(Uri.parse(APIConfig.loginUrl), body: {
       'email': email,
       'password': password,
     });
-
     if (response.statusCode == 200) {
       return response.body;
+    } else if (response.statusCode == 401) {
+      Fluttertoast.showToast(msg: 'بيانات خاطئة!');
+      throw Exception('Failed to log in: ${response.statusCode}');
     } else {
-      Fluttertoast.showToast(msg: 'حدث خطأ');
+      Fluttertoast.showToast(msg: 'حدث خطأ ما!');
       throw Exception('Failed to log in: ${response.statusCode}');
     }
   }

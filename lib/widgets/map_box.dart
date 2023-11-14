@@ -6,7 +6,11 @@ class MapBox extends StatefulWidget {
   final double latitude;
   final double longitude;
   final double zoomLvl;
-  const MapBox({super.key, required this.latitude, required this.longitude, required this.zoomLvl});
+  const MapBox(
+      {super.key,
+      required this.latitude,
+      required this.longitude,
+      required this.zoomLvl});
 
   @override
   State<MapBox> createState() => _MapBoxState();
@@ -24,6 +28,8 @@ class _MapBoxState extends State<MapBox> {
                 options: MapOptions(
                   initialCenter: LatLng(widget.latitude, widget.longitude),
                   initialZoom: widget.zoomLvl,
+                  interactiveFlags:
+                      InteractiveFlag.pinchZoom | InteractiveFlag.drag,
                 ),
                 children: [
                   TileLayer(

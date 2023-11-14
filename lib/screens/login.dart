@@ -1,5 +1,5 @@
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/screens/home.dart';
 import 'package:jwt_auth/services/auth_service.dart';
@@ -10,16 +10,18 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false; // Flag to track the loading state.
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -42,45 +44,57 @@ class _LoginPageState extends State<LoginPage> {
               textField('كلمة المرور', 'sudo su', passwordController,
                   isHide: true),
               ElevatedButton(
-                onPressed: () async {
-                  var connectivityResult =
-                      await (Connectivity().checkConnectivity());
-                  if (connectivityResult == ConnectivityResult.none) {
-                    // No internet connection
-                    Fluttertoast.showToast(
-                      msg: "لا يوجد اتصال بالانترنت",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                    );
-                    return; // Don't proceed with the login if there's no internet connection.
-                  }
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        var connectivityResult =
+                            await (Connectivity().checkConnectivity());
+                        if (connectivityResult == ConnectivityResult.none) {
+                          // No internet connection
+                          Fluttertoast.showToast(
+                            msg: "لا يوجد اتصال بالانترنت",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                          );
+                          return;
+                        }
+                        setState(() {
+                          isLoading = true;
+                        });
+                        try {
+                          final token = await AuthService().login(
+                              emailController.text, passwordController.text);
 
-                  try {
-                    final token = await AuthService()
-                        .login(emailController.text, passwordController.text);
-
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const HomeScreen(),
-                      ),
-                    );
-                    await AuthService().storeTokens(token);
-                  } catch (e) {
-                    throw ('Login failed: $e');
-                  }
-                },
+                          if (context.mounted) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const HomeScreen(),
+                              ),
+                            );
+                          }
+                          await AuthService().storeTokens(token);
+                        } catch (e) {
+                          throw ('Login failed: $e');
+                        } finally {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                      },
                 style: ButtonStyle(
                   minimumSize:
                       MaterialStateProperty.all<Size>(const Size(150, 50)),
                   backgroundColor:
                       MaterialStateProperty.all<Color>(AppColors.primaryColor),
                 ),
-                child: const Text(
-                  'دخول',
-                  style: TextStyle(fontSize: 16),
-                ),
+                child: isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text(
+                        'دخول',
+                        style: TextStyle(fontSize: 16),
+                      ),
               ),
             ],
           ),

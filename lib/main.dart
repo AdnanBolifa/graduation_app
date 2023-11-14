@@ -6,8 +6,6 @@ import 'package:jwt_auth/theme/colors.dart';
 import 'package:flutter/services.dart';
 import 'package:jwt_auth/theme/theme.dart';
 
-//todo make every field in the add ticket page required
-
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: AppColors.primaryColor,
