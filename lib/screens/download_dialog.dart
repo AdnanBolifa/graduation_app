@@ -19,7 +19,6 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
     super.initState();
     downloadProgress = 0.0;
     downloadStatus = 'جاري التحميل';
-
     downloadFile();
   }
 
