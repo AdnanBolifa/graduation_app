@@ -13,17 +13,17 @@ class SurveyPage extends StatefulWidget {
   const SurveyPage({Key? key, this.ticket}) : super(key: key);
 
   @override
-  _SurveyPageState createState() => _SurveyPageState();
+  State<SurveyPage> createState() => _SurveyPageState();
 }
 
 class _SurveyPageState extends State<SurveyPage> {
-  int selectedRating = 0;
   bool hasError = false;
 
   Map<int, int> questionRatings = {};
   List<String> answers = [];
   List<MultiSurvey> survey = [];
   final notes = TextEditingController();
+  List<int> selectedRatings = [];
 
   @override
   void initState() {
@@ -50,6 +50,7 @@ class _SurveyPageState extends State<SurveyPage> {
       final multi = await ApiService().fetchSurvey();
       setState(() {
         survey = multi;
+        selectedRatings = List.generate(survey.length, (index) => 0);
       });
     } catch (e) {
       if (kDebugMode) {
@@ -157,7 +158,7 @@ class _SurveyPageState extends State<SurveyPage> {
                                       Center(
                                         child: RatingBar.builder(
                                           initialRating:
-                                              selectedRating.toDouble(),
+                                              selectedRatings[i].toDouble(),
                                           minRating: 1,
                                           direction: Axis.horizontal,
                                           allowHalfRating: false,
@@ -172,7 +173,8 @@ class _SurveyPageState extends State<SurveyPage> {
                                           ),
                                           onRatingUpdate: (rating) {
                                             setState(() {
-                                              selectedRating = rating.toInt();
+                                              selectedRatings[i] =
+                                                  rating.toInt();
                                             });
                                           },
                                         ),
@@ -210,10 +212,12 @@ class _SurveyPageState extends State<SurveyPage> {
                                     });
                                   }
                                   if (survey[i].type == 'rating') {
-                                    answersList.add({
-                                      "question": survey[i].id,
-                                      "answer": selectedRating,
-                                    });
+                                    for (var item in selectedRatings) {
+                                      answersList.add({
+                                        "question": survey[i].id,
+                                        "answer": item,
+                                      });
+                                    }
                                   }
                                   if (survey[i].type == 'text') {
                                     answersList.add({

@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 
-Widget textReports(
-  String label,
-  String hint,
-  String value,
-  TextEditingController controller,
-  void Function(String) onChangedCallback,
-) {
+Widget textReports(String label, String hint, String value,
+    TextEditingController controller, void Function(String) onChangedCallback,
+    {bool? readOnly}) {
   return Column(
     children: [
       Directionality(
         textDirection: TextDirection.rtl,
         child: TextField(
+          readOnly: readOnly ?? false,
           controller: controller,
           textDirection: TextDirection.rtl,
           textAlign: TextAlign.right,

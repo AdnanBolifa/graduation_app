@@ -16,7 +16,7 @@ class CommentSection extends StatefulWidget {
       : super(key: key);
 
   @override
-  _CommentSectionState createState() => _CommentSectionState();
+  State<CommentSection> createState() => _CommentSectionState();
 }
 
 class _CommentSectionState extends State<CommentSection> {
