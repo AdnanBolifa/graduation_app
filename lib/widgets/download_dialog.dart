@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:jwt_auth/widgets/error_dialog.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -60,6 +61,10 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
       setState(() {
         downloadStatus = 'فشل التحميل';
       });
+      ErrorDialog(
+        line1: "catch dio fun",
+        line2: "DOWNLOAD ERROR: $error",
+      );
       debugPrint('DOWNLOAD ERROR: $error');
       if (context.mounted) {
         Navigator.of(context).pop();

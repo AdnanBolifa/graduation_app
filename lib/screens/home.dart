@@ -1,15 +1,16 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jwt_auth/data/api_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
-import 'package:jwt_auth/screens/download_dialog.dart';
+import 'package:jwt_auth/widgets/download_dialog.dart';
 import 'package:jwt_auth/screens/ticket_page.dart';
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 import 'package:jwt_auth/services/check_permissions.dart';
 import 'package:jwt_auth/theme/colors.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:jwt_auth/widgets/error_dialog.dart';
 import '../widgets/ticket_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -130,9 +131,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void getVersionInfo() async {
     try {
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      String? url =
-          await ApiService().checkAndUpdateVersion(packageInfo.version);
+      //PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      String? url = await ApiService().checkAndUpdateVersion(APIConfig.version);
       if (url != null) {
         Fluttertoast.showToast(
           msg: "تم العثور على تحديث!",
@@ -157,6 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
     } catch (e) {
+      ErrorDialog(line1: 'Catch Error: $e');
       debugPrint('Error getting version info: $e');
     }
   }

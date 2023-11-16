@@ -14,6 +14,7 @@ import 'package:jwt_auth/data/solution_config.dart';
 import 'package:jwt_auth/data/towers_config.dart';
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/auth_service.dart';
+import 'package:jwt_auth/widgets/error_dialog.dart';
 
 class ApiService {
   Future<void> addReport(
@@ -73,7 +74,6 @@ class ApiService {
       throw 'Id not provided';
     } else if (comment == null) {
       //update data
-      print('API: ${APIConfig.updateUrl}$id/edit');
       await _performPutRequest('${APIConfig.updateUrl}$id/edit', requestBody);
     } else {
       //add new comment
@@ -95,9 +95,19 @@ class ApiService {
         final users = data.map((user) => Ticket.fromJson(user)).toList();
         return users;
       } catch (e) {
+        ErrorDialog(
+          line1: "Response code: ${response.statusCode}",
+          line2: "Body: ${response.body}",
+          line3: "execption message: $e",
+        );
         debugPrint('Error parsing JSON: $e');
       }
     } else {
+      ErrorDialog(
+        line1: "Response code: ${response.statusCode}",
+        line2: "Body: ${response.body}",
+        line3: "execption message",
+      );
       debugPrint('Request failed with status code: ${response.statusCode}');
       debugPrint('Response content: ${response.body}');
     }
@@ -177,6 +187,11 @@ class ApiService {
           return null;
         }
       } else {
+        ErrorDialog(
+          line1: "Response code: ${response.statusCode}",
+          line2: "Body: ${response.body}",
+          line3: "execption message",
+        );
         debugPrint('Error: ${response.statusCode}');
         return null;
       }
@@ -188,94 +203,130 @@ class ApiService {
 
   //helper functions
   Future<http.Response> _performGetRequest(String url) async {
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      return response;
-    } else {
-      throw Exception('Failed to fetch data');
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        Fluttertoast.showToast(msg: 'خطأ ${response.statusCode}');
+        ErrorDialog(
+          line1: "Response code: ${response.statusCode}",
+          line2: "Body: ${response.body}",
+          line3: "API ",
+        );
+        throw Exception('Failed to fetch data');
+      }
+    } catch (error) {
+      debugPrint('_performGetRequest ERROR: $error');
+      rethrow;
     }
   }
 
   Future<void> _performPostRequest(String url, dynamic body) async {
-    final accessToken = await AuthService().getAccessToken();
-    final response = await http.post(
-      Uri.parse(url),
-      body: jsonEncode(body),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-    );
-    if (response.statusCode == 201 || response.statusCode == 200) {
-      Fluttertoast.showToast(
-        msg: "تمت اضافة البيانات بنجاح!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        textColor: Colors.white,
+    try {
+      final accessToken = await AuthService().getAccessToken();
+      final response = await http.post(
+        Uri.parse(url),
+        body: jsonEncode(body),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
       );
-    } else {
-      Fluttertoast.showToast(
-        msg: "لم تتم عملية الاضافة!",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        textColor: Colors.white,
-      );
-      throw Exception('Failed to add data: ${response.body}');
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        Fluttertoast.showToast(
+          msg: "تمت اضافة البيانات بنجاح!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          textColor: Colors.white,
+        );
+      } else {
+        Fluttertoast.showToast(
+          msg: "لم تتم عملية الاضافة!",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          textColor: Colors.white,
+        );
+        ErrorDialog(
+          line1: "Response code: ${response.statusCode}",
+          line2: "Body: ${response.body}",
+          line3: "exception message",
+        );
+      }
+    } catch (error) {
+      debugPrint('_performPostRequest ERROR: $error');
+      rethrow;
     }
   }
 
   Future<void> _performPutRequest(String url, dynamic body) async {
-    final accessToken = await AuthService().getAccessToken();
-    final response = await http.put(
-      Uri.parse(url),
-      body: jsonEncode(body),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-    );
+    try {
+      final accessToken = await AuthService().getAccessToken();
+      final response = await http.put(
+        Uri.parse(url),
+        body: jsonEncode(body),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      Fluttertoast.showToast(
-        msg: "تم تحديث البيانات بنجاح!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        textColor: Colors.white,
-      );
-    } else {
-      Fluttertoast.showToast(
-        msg: "!لم يتم التحديث",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        textColor: Colors.white,
-      );
-      throw Exception('Failed to update data: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(
+          msg: "تم تحديث البيانات بنجاح!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          textColor: Colors.white,
+        );
+      } else {
+        Fluttertoast.showToast(
+          msg: "!لم يتم التحديث ${response.statusCode}",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          textColor: Colors.white,
+        );
+        ErrorDialog(
+          line1: "Response code: ${response.statusCode}",
+          line2: "Body: ${response.body}",
+          line3: "exception message",
+        );
+        throw Exception('Failed to update data: ${response.statusCode}');
+      }
+    } catch (error) {
+      debugPrint('_performPutRequest ERROR: $error');
+      rethrow;
     }
   }
 
   Future<http.Response> _performAuthenticatedGetRequest(
       String url, AuthService authService,
       [BuildContext? context]) async {
-    final accessToken = await authService.getAccessToken();
-    final response = await http.get(Uri.parse(url), headers: {
-      'Authorization': 'Bearer $accessToken',
-    });
+    try {
+      final accessToken = await authService.getAccessToken();
+      final response = await http.get(Uri.parse(url), headers: {
+        'Authorization': 'Bearer $accessToken',
+      });
 
-    if (response.statusCode == 401) {
-      await authService.getNewAccessToken();
-      return _performAuthenticatedGetRequest(url, authService, context);
-    } else if (response.statusCode != 200 && context != null) {
-      if (context.mounted) {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const LoginPage(),
-        ));
+      if (response.statusCode == 401) {
+        await authService.getNewAccessToken();
+        return _performAuthenticatedGetRequest(url, authService, context);
+      } else if (response.statusCode != 200 && context != null) {
+        if (context.mounted) {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const LoginPage(),
+          ));
+        }
+        authService.logout();
       }
-      authService.logout();
-    }
 
-    return response;
+      return response;
+    } catch (error) {
+      debugPrint('_performAuthenticatedGetRequest ERROR: $error');
+      rethrow;
+    }
   }
 
+  //Parsing
   List<Problem> _parseProblemsResponse(http.Response response) {
     if (response.statusCode == 200) {
       final responseMap = jsonDecode(utf8.decode(response.bodyBytes));

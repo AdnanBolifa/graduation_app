@@ -8,6 +8,8 @@ header('Access-Control-Allow-Headers: *');
 function generateUniqueId() {
     return uniqid();
 }
+// Local version
+$localVersion = "1.0.1";
 
 function getApkFilePath() {
     // Specify the directory where the APK file is located
@@ -26,7 +28,7 @@ function getApkFilePath() {
 
 function generateApkUrl($apkFilePath) {
     // Create the URL based on the file name
-    $url = 'https://download1594.mediafire.com/vdbjdjgyi8bg3HIJDTPECpWBInHlh3K3pJ55S-FFdfaA6zuAsmBrmuv64Le5wE1tl8WLtZaNKqtEZxGjCrlmLNSnwKBIOKYSSiJQjAqUrwNh0Mc3z5IG2ZLqlu9VstgGjKM4sc2i4fvjMFk7TKxW7IiImks8lx-fTvJmfStCr4n8SNI/h5sl2es0lp6t2u5/' . basename($apkFilePath);
+    $url = 'http://10.255.255.15/' . basename($apkFilePath);
 
     return $url;
 }
@@ -42,9 +44,6 @@ try {
     if ($frontendVersion === null) {
         throw new Exception('Frontend version not provided');
     }
-
-    // Local version
-    $localVersion = "1.0.1";
 
     // Compare versions
     if (version_compare($frontendVersion, $localVersion, '<')) {

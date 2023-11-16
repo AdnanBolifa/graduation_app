@@ -432,6 +432,7 @@ class _AddTicketState extends State<AddTicket> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 15),
                                     child: ListView.builder(
+                                      primary: false,
                                       shrinkWrap: true,
                                       itemCount: textTrueProblem.length,
                                       itemBuilder: (context, index) {

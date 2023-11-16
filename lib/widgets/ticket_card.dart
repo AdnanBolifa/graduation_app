@@ -192,7 +192,7 @@ class TicketCard extends StatelessWidget {
                                     shape: BoxShape.rectangle,
                                     color: Colors.grey[300],
                                   ),
-                                  child: ticket.status == 'inprogress'
+                                  child: ticket.status != 'done'
                                       ? IconButton(
                                           onPressed: () {
                                             _makePhoneCall(ticket.mobile);
