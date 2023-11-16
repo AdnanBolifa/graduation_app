@@ -57,9 +57,11 @@ class AuthService {
 
       if (response.statusCode == 200) {
         debugPrint('=============================');
-        debugPrint('refreshed');
-        storeTokens(response.body);
+        final responseMap = jsonDecode(utf8.decode(response.bodyBytes));
+        storeTokens(responseMap['access']);
       } else {
+        debugPrint('=============================');
+        debugPrint('FAILD');
         throw Exception('Failed to log in');
       }
     });
@@ -69,5 +71,10 @@ class AuthService {
     // Remove both the access and refresh tokens when the user logs out.
     await storage.delete(key: 'access_token');
     await storage.delete(key: 'refresh_token');
+  }
+
+  Future<bool> isAuthenticated() async {
+    final accessToken = await getAccessToken();
+    return accessToken != null;
   }
 }

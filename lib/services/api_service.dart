@@ -377,4 +377,13 @@ class ApiService {
       throw Exception('Failed to fetch solutions');
     }
   }
+
+  // Future<void> _checkAuthentication() async {
+  //   // Add your authentication logic here, for example:
+  //   final isAuthenticated = await AuthService().isAuthenticated();
+  //   if (!isAuthenticated) {
+  //     // Handle the case where the user is not authenticated
+  //     throw Exception('User is not authenticated');
+  //   }
+  // }
 }

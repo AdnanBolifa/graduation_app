@@ -31,5 +31,5 @@ class APIConfig {
 
   static String checkUpdates = 'http://165.16.36.4:8015/checkUpdate.php';
 
-  static String version = '1.0.5';
+  static String version = '1.0.7';
 }

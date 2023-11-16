@@ -228,11 +228,11 @@ class _SurveyPageState extends State<SurveyPage> {
                                 }
                                 //?if you want all the feilds required uncoomment this
                                 //answersList.length == survey.length
-                                if (answersList.isEmpty) {
-                                  Fluttertoast.showToast(
-                                      msg: 'الرجاء تعبئة الحقول');
-                                  return;
-                                }
+                                // if (answers.isEmpty) {
+                                //   Fluttertoast.showToast(
+                                //       msg: 'الرجاء تعبئة الحقول');
+                                //   return;
+                                // }
                                 await ApiService().submitSurvey(
                                     widget.ticket!.id, answersList);
                                 if (context.mounted) {

@@ -54,6 +54,8 @@ class _AddTicketState extends State<AddTicket> {
   late List<bool> problemCheckboxGroup;
   late List<bool> solutionCheckboxGroup;
 
+  bool isLoadingLoc = false;
+
   void init() {
     if (widget.ticket != null) {
       name = nameController.text = widget.ticket!.userName;
@@ -566,28 +568,46 @@ class _AddTicketState extends State<AddTicket> {
                                     height: 55,
                                     child: ElevatedButton(
                                       onPressed: () async {
-                                        locationData = await locationService
-                                            .getUserLocation();
-                                        locationController.text =
-                                            '${locationData!.latitude}, ${locationData!.longitude}';
-                                        setState(() {
-                                          longitude = locationData!.longitude;
-                                          latitude = locationData!.latitude;
-                                        });
+                                        try {
+                                          setState(() {
+                                            isLoadingLoc =
+                                                true; // Set loading to true when starting to fetch data
+                                          });
+
+                                          locationData = await locationService
+                                              .getUserLocation();
+                                          locationController.text =
+                                              '${locationData!.latitude}, ${locationData!.longitude}';
+                                          setState(() {
+                                            longitude = locationData!.longitude;
+                                            latitude = locationData!.latitude;
+                                          });
+                                        } catch (e) {
+                                          // Handle any errors that might occur during location fetching
+                                          print("Error fetching location: $e");
+                                        } finally {
+                                          setState(() {
+                                            isLoadingLoc =
+                                                false; // Set loading to false when done fetching data
+                                          });
+                                        }
                                       },
                                       style: ElevatedButton.styleFrom(
-                                          minimumSize: const Size(60, 80),
-                                          backgroundColor: Colors.grey[300]),
-                                      child: const Center(
-                                        // Center the text
-                                        child: Text(
-                                          "جلب احداثيات الموقع",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w300),
-                                        ),
+                                        minimumSize: const Size(60, 80),
+                                        backgroundColor: Colors.grey[300],
+                                      ),
+                                      child: Center(
+                                        child: isLoadingLoc
+                                            ? const CircularProgressIndicator() // Show loading indicator
+                                            : const Text(
+                                                "جلب احداثيات الموقع",
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w300,
+                                                ),
+                                              ),
                                       ),
                                     ),
                                   ),
