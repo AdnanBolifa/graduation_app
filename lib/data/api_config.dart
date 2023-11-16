@@ -16,7 +16,8 @@ class APIConfig {
   // URLs for specific API endpoints
   static String loginUrl = _buildUrl('$_vipPath/login');
   static String refreshUrl = _buildUrl('$_vipPath/refresh');
-  static String reportsUrl = _buildUrl('$_ticketPath/list');
+
+  static String ticketsUrl = _buildUrl('$_ticketPath/list');
   static String solutionsUrl = _buildUrl('$_ticketPath/solutions/list');
   static String problemsUrl = _buildUrl('$_ticketPath/problems/list');
   static String addUrl = _buildUrl('$_ticketPath/add');

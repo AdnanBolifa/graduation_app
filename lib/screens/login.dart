@@ -67,6 +67,7 @@ class _LoginPageState extends State<LoginPage> {
                           final token = await AuthService().login(
                               emailController.text, passwordController.text);
 
+                          await AuthService().storeTokens(token);
                           if (context.mounted) {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -74,7 +75,6 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             );
                           }
-                          await AuthService().storeTokens(token);
                         } catch (e) {
                           throw ('Login failed: $e');
                         } finally {

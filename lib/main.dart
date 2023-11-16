@@ -6,6 +6,7 @@ import 'package:jwt_auth/theme/colors.dart';
 import 'package:flutter/services.dart';
 import 'package:jwt_auth/theme/theme.dart';
 
+GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: AppColors.primaryColor,
@@ -17,6 +18,7 @@ void main() async {
   debugPrint('Access Token: $accessToken');
   runApp(
     MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       home: accessToken != null ? const HomeScreen() : const LoginPage(),
       theme: customTheme,

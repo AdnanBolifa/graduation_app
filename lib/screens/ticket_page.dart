@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,8 @@ class _AddTicketState extends State<AddTicket> {
   TextEditingController placeController = TextEditingController();
   TextEditingController commentController = TextEditingController();
 
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
+
   String name = '';
   String account = '';
   String phone = '';
@@ -65,11 +68,12 @@ class _AddTicketState extends State<AddTicket> {
       account = accController.text = widget.ticket!.acc!;
       longitude = widget.ticket!.locationData!.longitude;
       latitude = widget.ticket!.locationData!.latitude;
+
+      _fetchData();
     }
     if (latitude != 0 && longitude != 0 && longitude != null) {
       locationController.text = '$latitude, $longitude';
     }
-    _fetchData();
   }
 
   @override
@@ -198,7 +202,9 @@ class _AddTicketState extends State<AddTicket> {
             ),
             child: ElevatedButton(
               onPressed: () {
-                _submitReport();
+                _memoizer.runOnce(() {
+                  _submitReport();
+                });
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
               child: const Text(
@@ -469,7 +475,8 @@ class _AddTicketState extends State<AddTicket> {
                                           ),
                                           child: IconButton(
                                             onPressed: () {
-                                              _showBottomSheetProblem(context);
+                                              _memoizer.runOnce(() =>
+                                                  _showBottomSheetProblem());
                                             },
                                             icon: const Icon(Icons.edit,
                                                 color: Colors.black),
@@ -547,7 +554,8 @@ class _AddTicketState extends State<AddTicket> {
                                           ),
                                           child: IconButton(
                                             onPressed: () {
-                                              _showBottomSheetSolution(context);
+                                              _memoizer.runOnce(() =>
+                                                  _showBottomSheetSolution());
                                             },
                                             icon: const Icon(Icons.edit,
                                                 color: Colors.black),
@@ -567,30 +575,33 @@ class _AddTicketState extends State<AddTicket> {
                                     width: 120,
                                     height: 55,
                                     child: ElevatedButton(
-                                      onPressed: () async {
-                                        try {
-                                          setState(() {
-                                            isLoadingLoc =
-                                                true; // Set loading to true when starting to fetch data
-                                          });
+                                      onPressed: () {
+                                        _memoizer.runOnce(() async {
+                                          try {
+                                            setState(() {
+                                              isLoadingLoc = true;
+                                            });
 
-                                          locationData = await locationService
-                                              .getUserLocation();
-                                          locationController.text =
-                                              '${locationData!.latitude}, ${locationData!.longitude}';
-                                          setState(() {
-                                            longitude = locationData!.longitude;
-                                            latitude = locationData!.latitude;
-                                          });
-                                        } catch (e) {
-                                          // Handle any errors that might occur during location fetching
-                                          print("Error fetching location: $e");
-                                        } finally {
-                                          setState(() {
-                                            isLoadingLoc =
-                                                false; // Set loading to false when done fetching data
-                                          });
-                                        }
+                                            locationData = await locationService
+                                                .getUserLocation();
+                                            locationController.text =
+                                                '${locationData!.latitude}, ${locationData!.longitude}';
+                                            setState(() {
+                                              longitude =
+                                                  locationData!.longitude;
+                                              latitude = locationData!.latitude;
+                                            });
+                                          } catch (e) {
+                                            // Handle any errors that might occur during location fetching
+                                            debugPrint(
+                                                "Error fetching location: $e");
+                                          } finally {
+                                            setState(() {
+                                              isLoadingLoc =
+                                                  false; // Set loading to false when done fetching data
+                                            });
+                                          }
+                                        });
                                       },
                                       style: ElevatedButton.styleFrom(
                                         minimumSize: const Size(60, 80),
@@ -769,7 +780,7 @@ class _AddTicketState extends State<AddTicket> {
     }
   }
 
-  void _showBottomSheetProblem(BuildContext context) {
+  void _showBottomSheetProblem() {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -807,7 +818,7 @@ class _AddTicketState extends State<AddTicket> {
     });
   }
 
-  void _showBottomSheetSolution(BuildContext context) {
+  void _showBottomSheetSolution() {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {

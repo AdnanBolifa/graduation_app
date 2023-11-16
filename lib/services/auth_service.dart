@@ -10,6 +10,7 @@ class AuthService {
 
   Future<String> login(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
+      Fluttertoast.showToast(msg: 'بيانات فارعة!');
       throw ArgumentError('Email and password must not be empty');
     }
     final response = await http.post(Uri.parse(APIConfig.loginUrl), body: {
@@ -57,11 +58,10 @@ class AuthService {
 
       if (response.statusCode == 200) {
         debugPrint('=============================');
-        final responseMap = jsonDecode(utf8.decode(response.bodyBytes));
-        storeTokens(responseMap['access']);
+        debugPrint('=refreshed= \n new access: ${response.body}');
+        storeTokens(response.body);
       } else {
-        debugPrint('=============================');
-        debugPrint('FAILD');
+        debugPrint('============FAILD to refresh============');
         throw Exception('Failed to log in');
       }
     });
@@ -71,10 +71,5 @@ class AuthService {
     // Remove both the access and refresh tokens when the user logs out.
     await storage.delete(key: 'access_token');
     await storage.delete(key: 'refresh_token');
-  }
-
-  Future<bool> isAuthenticated() async {
-    final accessToken = await getAccessToken();
-    return accessToken != null;
   }
 }

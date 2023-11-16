@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:jwt_auth/data/comment_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
@@ -20,6 +21,7 @@ class CommentSection extends StatefulWidget {
 }
 
 class _CommentSectionState extends State<CommentSection> {
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
   final TextEditingController commentController = TextEditingController();
 
   @override
@@ -44,23 +46,25 @@ class _CommentSectionState extends State<CommentSection> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ElevatedButton(
-                onPressed: () async {
-                  // Replace with your actual ApiService method
-                  ApiService().updateReport(
-                    comment: commentController.text,
-                    id: widget.id,
-                  );
-
-                  setState(() {
-                    widget.comments?.add(CommentData(
-                      ticket: 0,
-                      comment: commentController.text,
-                      createdAt: 'الأن',
-                      createdBy: 'انت',
-                    ));
-                  });
-                  commentController.clear();
-                },
+                onPressed: commentController.text.isEmpty
+                    ? () {}
+                    : () {
+                        _memoizer.runOnce(() {
+                          setState(() {
+                            widget.comments?.add(CommentData(
+                              ticket: 0,
+                              comment: commentController.text,
+                              createdAt: 'الأن',
+                              createdBy: 'انت',
+                            ));
+                          });
+                          ApiService().updateReport(
+                            comment: commentController.text,
+                            id: widget.id,
+                          );
+                          commentController.clear();
+                        });
+                      },
                 style: ButtonStyle(
                   minimumSize: MaterialStateProperty.all<Size>(
                     const Size(50, 50),

@@ -41,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _checkPermission() async {
-    await AuthService().getNewAccessToken();
     var permission = await checkAllPermissions.isStoragePermission();
     if (permission) {
       setState(() {

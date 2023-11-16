@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/data/api_config.dart';
-import 'package:jwt_auth/data/comment_config.dart';
 import 'package:jwt_auth/data/location_config.dart';
 import 'package:jwt_auth/data/multi_survey_config.dart';
 import 'package:jwt_auth/data/problem_config.dart';
@@ -12,6 +11,7 @@ import 'package:jwt_auth/data/sectors_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
 import 'package:jwt_auth/data/solution_config.dart';
 import 'package:jwt_auth/data/towers_config.dart';
+import 'package:jwt_auth/main.dart';
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 
@@ -81,11 +81,7 @@ class ApiService {
   }
 
   Future<List<Ticket>?> getReports(context) async {
-    final authService = AuthService();
-
-    final response = await _performAuthenticatedGetRequest(
-        APIConfig.reportsUrl, authService, context);
-
+    final response = await _performGetRequest(APIConfig.ticketsUrl);
     if (response.statusCode == 200) {
       try {
         final responseMap = jsonDecode(utf8.decode(response.bodyBytes));
@@ -108,13 +104,6 @@ class ApiService {
   Future<List<Problem>> fetchProblems() async {
     final response = await _performGetRequest(APIConfig.problemsUrl);
     return _parseProblemsResponse(response);
-  }
-
-  Future<List<CommentData>> fetchComments() async {
-    final authService = AuthService();
-    final response = await _performAuthenticatedGetRequest(
-        APIConfig.reportsUrl, authService);
-    return _parseCommentsResponse(response);
   }
 
   Future<List<Solution>> fetchSolutions() async {
@@ -188,118 +177,101 @@ class ApiService {
     }
   }
 
-  //helper functions
+  //API CALLS
   Future<http.Response> _performGetRequest(String url) async {
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        return response;
-      } else {
-        Fluttertoast.showToast(
-            msg: 'Failed to fetch data ${response.statusCode}');
-        throw Exception('Failed to fetch data');
-      }
-    } catch (error) {
-      Fluttertoast.showToast(msg: '_performGetRequest ERROR: $error');
-      debugPrint('_performGetRequest ERROR: $error');
-      rethrow;
-    }
+    return _performRequest(url, 'GET', null);
   }
 
   Future<void> _performPostRequest(String url, dynamic body) async {
-    try {
-      final accessToken = await AuthService().getAccessToken();
-      final response = await http.post(
-        Uri.parse(url),
-        body: jsonEncode(body),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
-      );
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        Fluttertoast.showToast(
-          msg: "تمت اضافة البيانات بنجاح!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          textColor: Colors.white,
-        );
-      } else {
-        Fluttertoast.showToast(
-          msg: "لم تتم عملية الاضافة! ${response.statusCode}",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          textColor: Colors.white,
-        );
-      }
-    } catch (error) {
-      Fluttertoast.showToast(msg: "_performPostRequest ERROR: $error");
-      debugPrint('_performPostRequest ERROR: $error');
-      rethrow;
-    }
+    await _performRequest(url, 'POST', body);
   }
 
   Future<void> _performPutRequest(String url, dynamic body) async {
+    await _performRequest(url, 'PUT', body);
+  }
+
+  //helper functions
+  Future<http.Response> _performRequest(String url, String method, dynamic body,
+      {int retryCount = 0}) async {
     try {
       final accessToken = await AuthService().getAccessToken();
-      final response = await http.put(
-        Uri.parse(url),
-        body: jsonEncode(body),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
-      );
+      final Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
 
-      if (response.statusCode == 200) {
-        Fluttertoast.showToast(
-          msg: "تم تحديث البيانات بنجاح!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          textColor: Colors.white,
+      http.Response response;
+
+      if (method == 'GET') {
+        response = await http.get(
+          Uri.parse(url),
+          headers: headers,
+        );
+      } else if (method == 'POST') {
+        response = await http.post(
+          Uri.parse(url),
+          body: (body != null) ? jsonEncode(body) : null,
+          headers: headers,
+        );
+      } else if (method == 'PUT') {
+        response = await http.put(
+          Uri.parse(url),
+          body: (body != null) ? jsonEncode(body) : null,
+          headers: headers,
         );
       } else {
-        Fluttertoast.showToast(
-          msg: "!لم يتم التحديث  ${response.statusCode}",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          textColor: Colors.white,
-        );
-        throw Exception('Failed to update data: ${response.statusCode}');
+        throw Exception('Unsupported HTTP method: $method');
       }
+
+      if (response.statusCode == 200) {
+        _handleSuccessMessage('GET', response);
+      } else if (response.statusCode == 201) {
+        _handleSuccessMessage('POST', response);
+      } else if (response.statusCode == 204) {
+        _handleSuccessMessage('PUT', response);
+      } else if (response.statusCode == 401) {
+        // Token expired, attempt to refresh
+        if (retryCount < 3) {
+          await AuthService().getNewAccessToken();
+          // Retry the original request with the new access token
+          return _performRequest(url, method, body, retryCount: retryCount + 1);
+        } else {
+          // If token refresh fails after multiple attempts, log the user out
+          await AuthService().logout();
+          navigatorKey.currentState?.push(
+            MaterialPageRoute(
+              builder: (context) => const LoginPage(),
+            ),
+          );
+        }
+      } else {
+        _handleOtherSuccessMessage(response);
+      }
+      return response; // Return the response if you need it
     } catch (error) {
-      Fluttertoast.showToast(msg: "_performPutRequest ERROR: $error");
-      debugPrint('_performPutRequest ERROR: $error');
+      Fluttertoast.showToast(msg: "Request ERROR: $error");
+      debugPrint('Request ERROR: $error');
       rethrow;
     }
   }
 
-  Future<http.Response> _performAuthenticatedGetRequest(
-      String url, AuthService authService,
-      [BuildContext? context]) async {
-    try {
-      final accessToken = await authService.getAccessToken();
-      final response = await http.get(Uri.parse(url), headers: {
-        'Authorization': 'Bearer $accessToken',
-      });
+  //API MESSAGES
+  void _handleSuccessMessage(String method, http.Response response) {
+    Fluttertoast.showToast(
+      msg: 'تمت $method البيانات بنجاح!',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      textColor: Colors.white,
+    );
+  }
 
-      if (response.statusCode == 401) {
-        await authService.getNewAccessToken();
-        return _performAuthenticatedGetRequest(url, authService, context);
-      } else if (response.statusCode != 200 && context != null) {
-        if (context.mounted) {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const LoginPage(),
-          ));
-        }
-        authService.logout();
-      }
-
-      return response;
-    } catch (error) {
-      debugPrint('_performAuthenticatedGetRequest ERROR: $error');
-      rethrow;
-    }
+  void _handleOtherSuccessMessage(http.Response response) {
+    Fluttertoast.showToast(
+      msg: '${response.statusCode}',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      textColor: Colors.white,
+    );
   }
 
   //Parsing
@@ -312,19 +284,6 @@ class ApiService {
       return problems;
     } else {
       throw Exception('Failed to fetch problems');
-    }
-  }
-
-  List<CommentData> _parseCommentsResponse(http.Response response) {
-    if (response.statusCode == 200) {
-      final responseMap = jsonDecode(utf8.decode(response.bodyBytes));
-      final List<dynamic> results = responseMap['results'];
-
-      final comments =
-          results.map((item) => CommentData.fromJson(item)).toList();
-      return comments;
-    } else {
-      throw Exception('Failed to fetch comments');
     }
   }
 
@@ -377,13 +336,4 @@ class ApiService {
       throw Exception('Failed to fetch solutions');
     }
   }
-
-  // Future<void> _checkAuthentication() async {
-  //   // Add your authentication logic here, for example:
-  //   final isAuthenticated = await AuthService().isAuthenticated();
-  //   if (!isAuthenticated) {
-  //     // Handle the case where the user is not authenticated
-  //     throw Exception('User is not authenticated');
-  //   }
-  // }
 }

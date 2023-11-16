@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/data/location_config.dart';
@@ -11,7 +12,8 @@ import 'package:url_launcher/url_launcher.dart';
 class TicketCard extends StatelessWidget {
   final Ticket ticket;
 
-  const TicketCard({Key? key, required this.ticket}) : super(key: key);
+  TicketCard({Key? key, required this.ticket}) : super(key: key);
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
 
   @override
   Widget build(BuildContext context) {
@@ -128,31 +130,38 @@ class TicketCard extends StatelessWidget {
                                                         const SizedBox(
                                                             height: 16),
                                                         ElevatedButton(
-                                                          onPressed: () async {
-                                                            Fluttertoast.showToast(
-                                                                msg:
-                                                                    'الرجائ الانتظار...');
-                                                            locationData =
-                                                                await locationService
-                                                                    .getUserLocation();
-                                                            ApiService()
-                                                                .startTimer(
-                                                                    locationData!,
-                                                                    ticket.id);
-                                                            if (context
-                                                                .mounted) {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .push(
-                                                                MaterialPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            const HomeScreen()),
-                                                              );
-                                                            }
+                                                          onPressed: () {
+                                                            _memoizer.runOnce(
+                                                                () async {
+                                                              debugPrint(
+                                                                  "starting");
+                                                              Fluttertoast
+                                                                  .showToast(
+                                                                      msg:
+                                                                          'الرجائ الانتظار...');
+                                                              locationData =
+                                                                  await locationService
+                                                                      .getUserLocation();
+                                                              ApiService()
+                                                                  .startTimer(
+                                                                      locationData!,
+                                                                      ticket
+                                                                          .id);
+                                                              if (context
+                                                                  .mounted) {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .push(
+                                                                  MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                              const HomeScreen()),
+                                                                );
+                                                              }
+                                                            });
                                                           },
                                                           child:
                                                               const Text('نعم'),

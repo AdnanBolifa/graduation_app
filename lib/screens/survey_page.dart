@@ -1,8 +1,8 @@
+import 'package:async/async.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/data/multi_survey_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
 import 'package:jwt_auth/screens/home.dart';
@@ -18,7 +18,7 @@ class SurveyPage extends StatefulWidget {
 
 class _SurveyPageState extends State<SurveyPage> {
   bool hasError = false;
-
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
   Map<int, int> questionRatings = {};
   List<String> answers = [];
   List<MultiSurvey> survey = [];
@@ -200,46 +200,49 @@ class _SurveyPageState extends State<SurveyPage> {
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.all(16.0),
                               ),
-                              onPressed: () async {
-                                List<Map<String, dynamic>> answersList = [];
+                              onPressed: () {
+                                _memoizer.runOnce(() async {
+                                  List<Map<String, dynamic>> answersList = [];
 
-                                for (int i = 0; i < survey.length; i++) {
-                                  if (questionRatings.containsKey(i)) {
-                                    int answer = questionRatings[i]!;
-                                    answersList.add({
-                                      "question": survey[i].id,
-                                      "answer": answer,
-                                    });
-                                  }
-                                  if (survey[i].type == 'rating') {
-                                    for (var item in selectedRatings) {
+                                  for (int i = 0; i < survey.length; i++) {
+                                    if (questionRatings.containsKey(i)) {
+                                      int answer = questionRatings[i]!;
                                       answersList.add({
                                         "question": survey[i].id,
-                                        "answer": item,
+                                        "answer": answer,
+                                      });
+                                    }
+                                    if (survey[i].type == 'rating') {
+                                      for (var item in selectedRatings) {
+                                        answersList.add({
+                                          "question": survey[i].id,
+                                          "answer": item,
+                                        });
+                                      }
+                                    }
+                                    if (survey[i].type == 'text') {
+                                      answersList.add({
+                                        "question": survey[i].id,
+                                        "answer": notes.text,
                                       });
                                     }
                                   }
-                                  if (survey[i].type == 'text') {
-                                    answersList.add({
-                                      "question": survey[i].id,
-                                      "answer": notes.text,
-                                    });
+                                  //?if you want all the feilds required uncoomment this
+                                  //answersList.length == survey.length
+                                  // if (answers.isEmpty) {
+                                  //   Fluttertoast.showToast(
+                                  //       msg: 'الرجاء تعبئة الحقول');
+                                  //   return;
+                                  // }
+                                  await ApiService().submitSurvey(
+                                      widget.ticket!.id, answersList);
+                                  if (context.mounted) {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomeScreen()));
                                   }
-                                }
-                                //?if you want all the feilds required uncoomment this
-                                //answersList.length == survey.length
-                                // if (answers.isEmpty) {
-                                //   Fluttertoast.showToast(
-                                //       msg: 'الرجاء تعبئة الحقول');
-                                //   return;
-                                // }
-                                await ApiService().submitSurvey(
-                                    widget.ticket!.id, answersList);
-                                if (context.mounted) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          const HomeScreen()));
-                                }
+                                });
                               },
                               child: const Text(
                                 'إرسال',
