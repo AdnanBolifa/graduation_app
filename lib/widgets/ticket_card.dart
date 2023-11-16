@@ -31,13 +31,12 @@ class TicketCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: Container(
-                decoration:
-                    ticket.status == 'notstarted' || ticket.status == 'done'
-                        ? BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
-                          )
-                        : null,
+                decoration: ticket.status == 'done'
+                    ? BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                    : null,
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

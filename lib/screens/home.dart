@@ -277,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemCount: ticketList.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(
-                                onTap: ticketList[index].status == 'inprogress'
+                                onTap: ticketList[index].status != 'done'
                                     ? () {
                                         Navigator.of(context).push(
                                           MaterialPageRoute(
