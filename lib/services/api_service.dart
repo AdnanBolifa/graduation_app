@@ -14,7 +14,6 @@ import 'package:jwt_auth/data/solution_config.dart';
 import 'package:jwt_auth/data/towers_config.dart';
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/auth_service.dart';
-import 'package:jwt_auth/widgets/error_dialog.dart';
 
 class ApiService {
   Future<void> addReport(
@@ -95,20 +94,11 @@ class ApiService {
         final users = data.map((user) => Ticket.fromJson(user)).toList();
         return users;
       } catch (e) {
-        ErrorDialog(
-          line1: "Response code: ${response.statusCode}",
-          line2: "Body: ${response.body}",
-          line3: "execption message: $e",
-        );
-        debugPrint('Error parsing JSON: $e');
+        Fluttertoast.showToast(msg: 'Error parsing JSON: $e');
       }
     } else {
-      ErrorDialog(
-        line1: "Response code: ${response.statusCode}",
-        line2: "Body: ${response.body}",
-        line3: "execption message",
-      );
-      debugPrint('Request failed with status code: ${response.statusCode}');
+      Fluttertoast.showToast(
+          msg: 'Request failed with status code: ${response.statusCode}');
       debugPrint('Response content: ${response.body}');
     }
 
@@ -187,15 +177,12 @@ class ApiService {
           return null;
         }
       } else {
-        ErrorDialog(
-          line1: "Response code: ${response.statusCode}",
-          line2: "Body: ${response.body}",
-          line3: "execption message",
-        );
+        Fluttertoast.showToast(msg: 'Error: ${response.statusCode}');
         debugPrint('Error: ${response.statusCode}');
         return null;
       }
     } catch (e) {
+      Fluttertoast.showToast(msg: 'Error: $e');
       debugPrint('Error: $e');
       return null;
     }
@@ -208,15 +195,12 @@ class ApiService {
       if (response.statusCode == 200) {
         return response;
       } else {
-        Fluttertoast.showToast(msg: 'خطأ ${response.statusCode}');
-        ErrorDialog(
-          line1: "Response code: ${response.statusCode}",
-          line2: "Body: ${response.body}",
-          line3: "API ",
-        );
+        Fluttertoast.showToast(
+            msg: 'Failed to fetch data ${response.statusCode}');
         throw Exception('Failed to fetch data');
       }
     } catch (error) {
+      Fluttertoast.showToast(msg: '_performGetRequest ERROR: $error');
       debugPrint('_performGetRequest ERROR: $error');
       rethrow;
     }
@@ -242,18 +226,14 @@ class ApiService {
         );
       } else {
         Fluttertoast.showToast(
-          msg: "لم تتم عملية الاضافة!",
+          msg: "لم تتم عملية الاضافة! ${response.statusCode}",
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.BOTTOM,
           textColor: Colors.white,
         );
-        ErrorDialog(
-          line1: "Response code: ${response.statusCode}",
-          line2: "Body: ${response.body}",
-          line3: "exception message",
-        );
       }
     } catch (error) {
+      Fluttertoast.showToast(msg: "_performPostRequest ERROR: $error");
       debugPrint('_performPostRequest ERROR: $error');
       rethrow;
     }
@@ -280,19 +260,15 @@ class ApiService {
         );
       } else {
         Fluttertoast.showToast(
-          msg: "!لم يتم التحديث ${response.statusCode}",
+          msg: "!لم يتم التحديث  ${response.statusCode}",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           textColor: Colors.white,
         );
-        ErrorDialog(
-          line1: "Response code: ${response.statusCode}",
-          line2: "Body: ${response.body}",
-          line3: "exception message",
-        );
         throw Exception('Failed to update data: ${response.statusCode}');
       }
     } catch (error) {
+      Fluttertoast.showToast(msg: "_performPutRequest ERROR: $error");
       debugPrint('_performPutRequest ERROR: $error');
       rethrow;
     }
@@ -395,9 +371,6 @@ class ApiService {
     if (response.statusCode == 200) {
       final responseMap = jsonDecode(utf8.decode(response.bodyBytes));
       final List<dynamic> results = responseMap['results'];
-      //todo
-      //int count = responseMap['count'] as int;
-
       final survey = results.map((item) => MultiSurvey.fromJson(item)).toList();
       return survey;
     } else {

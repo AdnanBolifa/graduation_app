@@ -329,23 +329,15 @@ class _AddTicketState extends State<AddTicket> {
                                       },
                                     ),
                                   ),
-                                  if (widget.ticket != null)
-                                    const SizedBox(width: 8),
-                                  if (widget.ticket != null)
-                                    Expanded(
-                                      child: textReports(
-                                        'البرج',
-                                        'ZXX-SECXX',
-                                        sector,
-                                        sectorController,
-                                        (value) {
-                                          setState(() {
-                                            sector = value;
-                                          });
-                                        },
-                                        readOnly: true,
-                                      ),
-                                    ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: textReports('البرج', 'ZXX-SECXX',
+                                        sector, sectorController, (value) {
+                                      setState(() {
+                                        sector = value;
+                                      });
+                                    }),
+                                  ),
                                 ],
                               ),
                               Row(
@@ -672,8 +664,7 @@ class _AddTicketState extends State<AddTicket> {
         account.isEmpty ||
         phone.isEmpty ||
         place.isEmpty ||
-        selectedSector == null ||
-        selectedTower == null ||
+        sector.isEmpty ||
         locationController.text.isEmpty) {
       Fluttertoast.showToast(msg: "الرجاء ملء الحقول");
       return;
@@ -699,7 +690,8 @@ class _AddTicketState extends State<AddTicket> {
             account,
             phone,
             place,
-            ('${selectedTower!.name}-${selectedSector!.name}'),
+            //('${selectedTower!.name}-${selectedSector!.name}'),
+            sector,
             selectedProblemIds,
             selectedSolutionIds,
             locationData!.longitude!,
@@ -710,7 +702,8 @@ class _AddTicketState extends State<AddTicket> {
             acc: accController.text,
             phone: phoneController.text,
             place: placeController.text,
-            sector: ('${selectedTower!.name}-${selectedSector!.name}'),
+            sector:
+                sector, //('${selectedTower!.name}-${selectedSector!.name}'),
             id: widget.ticket!.id,
             problems: selectedProblemIds,
             solution: selectedSolutionIds,

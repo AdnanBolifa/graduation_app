@@ -234,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ? "😎 لا يوجد لديك اي بلاغ "
                         : noInternet
                             ? "لا يوجد اتصال بالإنترنت"
-                            : "An error occurred",
+                            : "حدث خطأ يرجى تسجيل الخروج",
                     style: const TextStyle(fontSize: 22),
                   ),
                   const SizedBox(height: 10),

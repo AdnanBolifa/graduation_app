@@ -1,6 +1,6 @@
 class Sector {
   final int id;
-  final String name;
+  String name;
   final int tower;
   Sector({required this.id, required this.name, required this.tower});
 

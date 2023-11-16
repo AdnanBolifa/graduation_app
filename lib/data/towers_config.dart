@@ -2,7 +2,7 @@ import 'package:jwt_auth/data/sectors_config.dart';
 
 class Tower {
   final int id;
-  final String name;
+  String name;
   List<Sector>? sectors;
 
   Tower({required this.id, required this.name, this.sectors});

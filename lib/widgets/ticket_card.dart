@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/data/location_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
-import 'package:jwt_auth/screens/ticket_page.dart';
+import 'package:jwt_auth/screens/home.dart';
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/services/location_services.dart';
 import 'package:jwt_auth/theme/colors.dart';
@@ -107,73 +107,88 @@ class TicketCard extends StatelessWidget {
                                           ),
                                     onPressed: ticket.status == 'notstarted'
                                         ? () {
-                                            final snackBar = SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  InkWell(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    onTap: () {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .hideCurrentSnackBar();
-                                                    },
-                                                    child: const Icon(
-                                                      Icons.close, // Close icon
-                                                      color: Colors.white,
+                                            showModalBottomSheet(
+                                              context: context,
+                                              isScrollControlled: true,
+                                              builder: (BuildContext context) {
+                                                return SingleChildScrollView(
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            16),
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        const Text(
+                                                          'هل أنت متأكد من بدء المهمة؟',
+                                                          style: TextStyle(
+                                                              fontSize: 18),
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 16),
+                                                        ElevatedButton(
+                                                          onPressed: () async {
+                                                            Fluttertoast.showToast(
+                                                                msg:
+                                                                    'الرجائ الانتظار...');
+                                                            locationData =
+                                                                await locationService
+                                                                    .getUserLocation();
+                                                            ApiService()
+                                                                .startTimer(
+                                                                    locationData!,
+                                                                    ticket.id);
+                                                            if (context
+                                                                .mounted) {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .push(
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            const HomeScreen()),
+                                                              );
+                                                            }
+                                                          },
+                                                          child:
+                                                              const Text('نعم'),
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 16),
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          child: const Text(
+                                                              'إلغاء'),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                  SnackBarAction(
-                                                    label: 'نعم',
-                                                    onPressed: () async {
-                                                      locationData =
-                                                          await locationService
-                                                              .getUserLocation();
-                                                      ApiService().startTimer(
-                                                          locationData!,
-                                                          ticket.id);
-                                                      if (context.mounted) {
-                                                        Navigator.of(context)
-                                                            .push(
-                                                          MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                AddTicket(
-                                                                    ticket:
-                                                                        ticket),
-                                                          ),
-                                                        );
-                                                      }
-                                                    },
-                                                  ),
-                                                  const Expanded(
-                                                    child: Text(
-                                                      'هل انت متأكد من بدأ المهمة؟',
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                      style: TextStyle(
-                                                          fontSize: 16),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                                );
+                                              },
                                             );
-
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(snackBar);
                                           }
                                         : () {
                                             Fluttertoast.showToast(
                                                 msg:
                                                     'هذه المهمة قد بدأت بالفعل');
                                           },
-                                    child: Text('بدأ المهمة الان',
-                                        style: ticket.status == 'notstarted'
-                                            ? const TextStyle(
-                                                fontWeight: FontWeight.bold)
-                                            : TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.grey[600])),
+                                    child: Text(
+                                      'بدأ المهمة الان',
+                                      style: ticket.status == 'notstarted'
+                                          ? const TextStyle(
+                                              fontWeight: FontWeight.bold)
+                                          : TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey[600]),
+                                    ),
                                   )
                                 : null,
                           ),
