@@ -202,9 +202,7 @@ class _AddTicketState extends State<AddTicket> {
             ),
             child: ElevatedButton(
               onPressed: () {
-                _memoizer.runOnce(() {
-                  _submitReport();
-                });
+                _submitReport();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
               child: const Text(

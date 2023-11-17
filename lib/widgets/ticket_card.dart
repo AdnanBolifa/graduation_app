@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/data/location_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
+import 'package:jwt_auth/main.dart';
 import 'package:jwt_auth/screens/home.dart';
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/services/location_services.dart';
@@ -152,13 +153,14 @@ class TicketCard extends StatelessWidget {
                                                                 Navigator.of(
                                                                         context)
                                                                     .pop();
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .push(
+                                                                navigatorKey
+                                                                    .currentState
+                                                                    ?.push(
                                                                   MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) =>
-                                                                              const HomeScreen()),
+                                                                    builder:
+                                                                        (context) =>
+                                                                            const HomeScreen(),
+                                                                  ),
                                                                 );
                                                               }
                                                             });
