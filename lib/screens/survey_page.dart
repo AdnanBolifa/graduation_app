@@ -8,6 +8,7 @@ import 'package:jwt_auth/data/multi_survey_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
 import 'package:jwt_auth/screens/home.dart';
 import 'package:jwt_auth/services/api_service.dart';
+import 'package:jwt_auth/services/debouncer.dart';
 
 class SurveyPage extends StatefulWidget {
   final Ticket? ticket;
@@ -20,13 +21,12 @@ class SurveyPage extends StatefulWidget {
 
 class _SurveyPageState extends State<SurveyPage> {
   bool hasError = false;
-  final AsyncMemoizer _memoizer = AsyncMemoizer();
   Map<int, int> questionRatings = {};
   List<String> answers = [];
   List<MultiSurvey> survey = [];
   List<TextEditingController> notesControllers = [];
   List<int> selectedRatings = [];
-
+  final Debouncer _debouncer = Debouncer();
   @override
   void initState() {
     super.initState();
@@ -233,40 +233,48 @@ class _SurveyPageState extends State<SurveyPage> {
         foregroundColor: Colors.white,
         padding: const EdgeInsets.all(16.0),
       ),
-      onPressed: () async {
-        List<Map<String, dynamic>> answersList = [];
-        for (int i = 0; i < survey.length; i++) {
-          if (survey[i].type == 'multi') {
-            answersList.add({
-              "question": survey[i].id,
-              "answer": questionRatings[i],
-            });
+      onPressed: () {
+        _debouncer.run(() async {
+          debugPrint('Debounced');
+          List<Map<String, dynamic>> answersList = [];
+          for (int i = 0; i < survey.length; i++) {
+            if (survey[i].type == 'multi') {
+              answersList.add({
+                "question": survey[i].id,
+                "answer": questionRatings[i],
+              });
+            }
+            if (survey[i].type == 'rating') {
+              answersList.add({
+                "question": survey[i].id,
+                "answer": selectedRatings[i],
+              });
+            }
+            if (survey[i].type == 'text') {
+              answersList.add({
+                "question": survey[i].id,
+                "answer": notesControllers[i].text,
+              });
+            }
           }
-          if (survey[i].type == 'rating') {
-            answersList.add({
-              "question": survey[i].id,
-              "answer": selectedRatings[i],
-            });
+          //No null or empty values
+          bool isValid = answersList.every((answer) =>
+              answer['answer'] != null &&
+              answer['answer'].toString().isNotEmpty &&
+              answer['answer'] != 0);
+          if (!isValid) {
+            Fluttertoast.showToast(msg: 'الرجاء تعبئة الحقول');
+            return;
           }
-          if (survey[i].type == 'text') {
-            answersList.add({
-              "question": survey[i].id,
-              "answer": notesControllers[i].text,
-            });
+          await ApiService().submitSurvey(widget.ticket!.id, answersList);
+          if (context.mounted) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ),
+            );
           }
-        }
-        if (answersList.isEmpty) {
-          Fluttertoast.showToast(msg: 'الرجاء تعبئة الحقول');
-          return;
-        }
-        await ApiService().submitSurvey(widget.ticket!.id, answersList);
-        if (context.mounted) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const HomeScreen(),
-            ),
-          );
-        }
+        });
       },
       child: const Text(
         'إرسال',
@@ -279,11 +287,11 @@ class _SurveyPageState extends State<SurveyPage> {
     return Row(
       children: [
         Radio(
-          value: value,
+          value: value + 1, //start the radio button from one not zero
           groupValue: questionRatings[question] ?? -1,
           onChanged: (int? rating) {
             setState(() {
-              questionRatings[question] = rating!;
+              questionRatings[question] = rating! - 1;
             });
           },
         ),
