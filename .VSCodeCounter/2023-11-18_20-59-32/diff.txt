@@ -1,0 +1,208 @@
+Date : 2023-11-18 20:59:32
+Directory : d:\Dev\Projects\Flutter\Tickets\Tickets\lib
+Total : 111 files,  -1515 codes, -278 comments, -256 blanks, all -2049 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Dart       |         59 |         56 |          3 |         28 |         87 |
+| Properties |          2 |         -8 |          0 |         -2 |        -10 |
+| Markdown   |          3 |        -13 |          0 |        -10 |        -23 |
+| HTML       |          1 |        -38 |        -16 |         -6 |        -60 |
+| YAML       |          2 |        -46 |        -82 |        -21 |       -149 |
+| Swift      |          6 |        -64 |         -7 |        -20 |        -91 |
+| Groovy     |          3 |       -104 |         -5 |        -22 |       -131 |
+| JSON       |          8 |       -248 |          0 |         -4 |       -252 |
+| XML        |         11 |       -499 |        -50 |        -17 |       -566 |
+| C++        |         16 |       -551 |       -121 |       -182 |       -854 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                       | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                          |         32 |      2,742 |         60 |        248 |      3,050 |
+| . (Files)                                                                                  |          1 |         24 |          0 |          4 |         28 |
+| assets                                                                                     |          2 |         14 |          0 |          2 |         16 |
+| assets\translations                                                                        |          2 |         14 |          0 |          2 |         16 |
+| data                                                                                       |         10 |        208 |         10 |         46 |        264 |
+| e:\                                                                                        |         79 |     -4,257 |       -338 |       -504 |     -5,099 |
+| e:\Dev                                                                                     |         79 |     -4,257 |       -338 |       -504 |     -5,099 |
+| e:\Dev\Projects                                                                            |         79 |     -4,257 |       -338 |       -504 |     -5,099 |
+| e:\Dev\Projects\HTI                                                                        |         79 |     -4,257 |       -338 |       -504 |     -5,099 |
+| e:\Dev\Projects\HTI\jwt_auth                                                               |         79 |     -4,257 |       -338 |       -504 |     -5,099 |
+| e:\Dev\Projects\HTI\jwt_auth (Files)                                                       |          4 |        -56 |        -82 |        -29 |       -167 |
+| e:\Dev\Projects\HTI\jwt_auth\android                                                       |         13 |       -207 |        -53 |        -38 |       -298 |
+| e:\Dev\Projects\HTI\jwt_auth\android (Files)                                               |          3 |        -56 |          0 |        -11 |        -67 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app                                                   |          9 |       -146 |        -53 |        -26 |       -225 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app (Files)                                           |          1 |        -51 |         -5 |        -12 |        -68 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src                                               |          8 |        -95 |        -48 |        -14 |       -157 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\debug                                         |          1 |         -6 |         -4 |         -2 |        -12 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main                                          |          6 |        -84 |        -40 |        -10 |       -134 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main (Files)                                  |          1 |        -54 |         -8 |         -4 |        -66 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res                                      |          5 |        -30 |        -32 |         -6 |        -68 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res\drawable                             |          1 |         -4 |         -7 |         -2 |        -13 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res\drawable-v21                         |          1 |         -4 |         -7 |         -2 |        -13 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res\values                               |          1 |         -9 |         -9 |         -1 |        -19 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res\values-night                         |          1 |         -9 |         -9 |         -1 |        -19 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res\xml                                  |          1 |         -4 |          0 |          0 |         -4 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\profile                                       |          1 |         -5 |         -4 |         -2 |        -11 |
+| e:\Dev\Projects\HTI\jwt_auth\android\gradle                                                |          1 |         -5 |          0 |         -1 |         -6 |
+| e:\Dev\Projects\HTI\jwt_auth\android\gradle\wrapper                                        |          1 |         -5 |          0 |         -1 |         -6 |
+| e:\Dev\Projects\HTI\jwt_auth\ios                                                           |          8 |       -229 |         -4 |        -13 |       -246 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner                                                    |          7 |       -222 |         -2 |         -9 |       -233 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner (Files)                                            |          2 |        -13 |          0 |         -3 |        -16 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\RunnerTests                                               |          1 |         -7 |         -2 |         -4 |        -13 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\Assets.xcassets                                    |          3 |       -148 |          0 |         -4 |       -152 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\Assets.xcassets\AppIcon.appiconset                 |          1 |       -122 |          0 |         -1 |       -123 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\Assets.xcassets\LaunchImage.imageset               |          2 |        -26 |          0 |         -3 |        -29 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\Base.lproj                                         |          2 |        -61 |         -2 |         -2 |        -65 |
+| e:\Dev\Projects\HTI\jwt_auth\lib                                                           |         30 |     -2,672 |        -47 |       -214 |     -2,933 |
+| e:\Dev\Projects\HTI\jwt_auth\lib (Files)                                                   |          1 |        -22 |          0 |         -4 |        -26 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\assets                                                    |          2 |        -14 |          0 |         -2 |        -16 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\assets\translations                                       |          2 |        -14 |          0 |         -2 |        -16 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data                                                      |         10 |       -207 |        -10 |        -44 |       -261 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\screens                                                   |          5 |     -1,496 |        -24 |        -78 |     -1,598 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\services                                                  |          4 |       -422 |         -9 |        -56 |       -487 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\theme                                                     |          3 |        -18 |         -1 |         -5 |        -24 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\widgets                                                   |          5 |       -493 |         -3 |        -25 |       -521 |
+| e:\Dev\Projects\HTI\jwt_auth\linux                                                         |          5 |       -102 |        -27 |        -38 |       -167 |
+| e:\Dev\Projects\HTI\jwt_auth\linux (Files)                                                 |          3 |        -86 |        -18 |        -27 |       -131 |
+| e:\Dev\Projects\HTI\jwt_auth\linux\flutter                                                 |          2 |        -16 |         -9 |        -11 |        -36 |
+| e:\Dev\Projects\HTI\jwt_auth\macos                                                         |          6 |       -456 |         -5 |        -16 |       -477 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Flutter                                                 |          1 |        -18 |         -3 |         -4 |        -25 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Runner                                                  |          4 |       -431 |          0 |         -8 |       -439 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Runner (Files)                                          |          2 |        -20 |          0 |         -6 |        -26 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\RunnerTests                                             |          1 |         -7 |         -2 |         -4 |        -13 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Runner\Assets.xcassets                                  |          1 |        -68 |          0 |         -1 |        -69 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Runner\Assets.xcassets\AppIcon.appiconset               |          1 |        -68 |          0 |         -1 |        -69 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Runner\Base.lproj                                       |          1 |       -343 |          0 |         -1 |       -344 |
+| e:\Dev\Projects\HTI\jwt_auth\test                                                          |          1 |        -14 |        -10 |         -6 |        -30 |
+| e:\Dev\Projects\HTI\jwt_auth\web                                                           |          2 |        -73 |        -16 |         -7 |        -96 |
+| e:\Dev\Projects\HTI\jwt_auth\windows                                                       |         10 |       -448 |        -94 |       -143 |       -685 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\flutter                                               |          2 |        -20 |         -9 |        -11 |        -40 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\runner                                                |          8 |       -428 |        -85 |       -132 |       -645 |
+| screens                                                                                    |          4 |      1,429 |         23 |         79 |      1,531 |
+| services                                                                                   |          5 |        423 |         21 |         65 |        509 |
+| theme                                                                                      |          3 |         18 |          1 |          5 |         24 |
+| widgets                                                                                    |          7 |        626 |          5 |         47 |        678 |
++--------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                   | language   | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\assets\translations\ar_SA.json                 | JSON       |          7 |          0 |          1 |          8 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\assets\translations\en_US.json                 | JSON       |          7 |          0 |          1 |          8 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\api_config.dart                           | Dart       |         21 |          6 |         10 |         37 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\comment_config.dart                       | Dart       |         23 |          0 |          4 |         27 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\location_config.dart                      | Dart       |          5 |          0 |          2 |          7 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\multi_answers.dart                        | Dart       |         11 |          0 |          3 |         14 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\multi_survey_config.dart                  | Dart       |         29 |          0 |          7 |         36 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\problem_config.dart                       | Dart       |         11 |          0 |          3 |         14 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\sectors_config.dart                       | Dart       |         13 |          0 |          2 |         15 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\solution_config.dart                      | Dart       |         11 |          0 |          3 |         14 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\ticket_config.dart                        | Dart       |         71 |          4 |          8 |         83 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\towers_config.dart                        | Dart       |         13 |          0 |          4 |         17 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\main.dart                                      | Dart       |         24 |          0 |          4 |         28 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\screens\home.dart                              | Dart       |        289 |          4 |         17 |        310 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\screens\login.dart                             | Dart       |         95 |          1 |          6 |        102 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\screens\survey_page.dart                       | Dart       |        292 |          2 |         19 |        313 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\screens\ticket_page.dart                       | Dart       |        753 |         16 |         37 |        806 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\services\api_service.dart                      | Dart       |        300 |         12 |         38 |        350 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\services\auth_service.dart                     | Dart       |         65 |          1 |         11 |         77 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\services\check_permissions.dart                | Dart       |         26 |          8 |          8 |         42 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\services\debouncer.dart                        | Dart       |         14 |          0 |          3 |         17 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\services\location_services.dart                | Dart       |         18 |          0 |          5 |         23 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\theme\colors.dart                              | Dart       |          7 |          0 |          2 |          9 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\theme\routes.dart                              | Dart       |          4 |          1 |          1 |          6 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\theme\theme.dart                               | Dart       |          7 |          0 |          2 |          9 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\comment_card.dart                      | Dart       |         53 |          0 |          4 |         57 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\comment_section.dart                   | Dart       |         87 |          1 |          8 |         96 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\download_dialog.dart                   | Dart       |         89 |          1 |         13 |        103 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\error_dialog.dart                      | Dart       |         29 |          0 |          4 |         33 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\map_box.dart                           | Dart       |         60 |          1 |          4 |         65 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\text_field.dart                        | Dart       |         69 |          0 |          3 |         72 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\ticket_card.dart                       | Dart       |        239 |          2 |         11 |        252 |
+| e:\Dev\Projects\HTI\jwt_auth\README.md                                                     | Markdown   |        -10 |          0 |         -7 |        -17 |
+| e:\Dev\Projects\HTI\jwt_auth\analysis_options.yaml                                         | YAML       |         -3 |        -22 |         -4 |        -29 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\build.gradle                                      | Groovy     |        -51 |         -5 |        -12 |        -68 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\debug\AndroidManifest.xml                     | XML        |         -6 |         -4 |         -2 |        -12 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\AndroidManifest.xml                      | XML        |        -54 |         -8 |         -4 |        -66 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res\drawable-v21\launch_background.xml   | XML        |         -4 |         -7 |         -2 |        -13 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res\drawable\launch_background.xml       | XML        |         -4 |         -7 |         -2 |        -13 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res\values-night\styles.xml              | XML        |         -9 |         -9 |         -1 |        -19 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res\values\styles.xml                    | XML        |         -9 |         -9 |         -1 |        -19 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\main\res\xml\file_paths.xml                   | XML        |         -4 |          0 |          0 |         -4 |
+| e:\Dev\Projects\HTI\jwt_auth\android\app\src\profile\AndroidManifest.xml                   | XML        |         -5 |         -4 |         -2 |        -11 |
+| e:\Dev\Projects\HTI\jwt_auth\android\build.gradle                                          | Groovy     |        -37 |          0 |         -5 |        -42 |
+| e:\Dev\Projects\HTI\jwt_auth\android\gradle.properties                                     | Properties |         -3 |          0 |         -1 |         -4 |
+| e:\Dev\Projects\HTI\jwt_auth\android\gradle\wrapper\gradle-wrapper.properties              | Properties |         -5 |          0 |         -1 |         -6 |
+| e:\Dev\Projects\HTI\jwt_auth\android\settings.gradle                                       | Groovy     |        -16 |          0 |         -5 |        -21 |
+| e:\Dev\Projects\HTI\jwt_auth\docs.md                                                       | Markdown   |          0 |          0 |         -1 |         -1 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\RunnerTests\RunnerTests.swift                             | Swift      |         -7 |         -2 |         -4 |        -13 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\AppDelegate.swift                                  | Swift      |        -12 |          0 |         -2 |        -14 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\Assets.xcassets\AppIcon.appiconset\Contents.json   | JSON       |       -122 |          0 |         -1 |       -123 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\Assets.xcassets\LaunchImage.imageset\Contents.json | JSON       |        -23 |          0 |         -1 |        -24 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\Assets.xcassets\LaunchImage.imageset\README.md     | Markdown   |         -3 |          0 |         -2 |         -5 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\Base.lproj\LaunchScreen.storyboard                 | XML        |        -36 |         -1 |         -1 |        -38 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\Base.lproj\Main.storyboard                         | XML        |        -25 |         -1 |         -1 |        -27 |
+| e:\Dev\Projects\HTI\jwt_auth\ios\Runner\Runner-Bridging-Header.h                           | C++        |         -1 |          0 |         -1 |         -2 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\assets\translations\ar_SA.json                            | JSON       |         -7 |          0 |         -1 |         -8 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\assets\translations\en_US.json                            | JSON       |         -7 |          0 |         -1 |         -8 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data\api_config.dart                                      | Dart       |        -20 |         -6 |         -8 |        -34 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data\comment_config.dart                                  | Dart       |        -23 |          0 |         -4 |        -27 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data\location_config.dart                                 | Dart       |         -5 |          0 |         -2 |         -7 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data\multi_answers.dart                                   | Dart       |        -11 |          0 |         -3 |        -14 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data\multi_survey_config.dart                             | Dart       |        -29 |          0 |         -7 |        -36 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data\problem_config.dart                                  | Dart       |        -11 |          0 |         -3 |        -14 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data\sectors_config.dart                                  | Dart       |        -13 |          0 |         -2 |        -15 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data\solution_config.dart                                 | Dart       |        -11 |          0 |         -3 |        -14 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data\ticket_config.dart                                   | Dart       |        -71 |         -4 |         -8 |        -83 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\data\towers_config.dart                                   | Dart       |        -13 |          0 |         -4 |        -17 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\main.dart                                                 | Dart       |        -22 |          0 |         -4 |        -26 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\screens\download_dialog.dart                              | Dart       |        -71 |          0 |         -9 |        -80 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\screens\home.dart                                         | Dart       |       -293 |         -3 |        -17 |       -313 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\screens\login.dart                                        | Dart       |        -99 |         -1 |         -6 |       -106 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\screens\survey_page.dart                                  | Dart       |       -259 |         -4 |        -13 |       -276 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\screens\ticket_page.dart                                  | Dart       |       -774 |        -16 |        -33 |       -823 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\services\api_service.dart                                 | Dart       |       -314 |         -6 |        -37 |       -357 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\services\auth_service.dart                                | Dart       |        -62 |         -1 |        -11 |        -74 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\services\check_permissions.dart                           | Dart       |        -22 |          0 |         -2 |        -24 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\services\location_services.dart                           | Dart       |        -24 |         -2 |         -6 |        -32 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\theme\colors.dart                                         | Dart       |         -7 |          0 |         -2 |         -9 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\theme\routes.dart                                         | Dart       |         -4 |         -1 |         -1 |         -6 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\theme\theme.dart                                          | Dart       |         -7 |          0 |         -2 |         -9 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\widgets\comment_card.dart                                 | Dart       |        -53 |          0 |         -4 |        -57 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\widgets\comment_section.dart                              | Dart       |        -80 |         -1 |         -7 |        -88 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\widgets\map_box.dart                                      | Dart       |        -60 |          0 |         -4 |        -64 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\widgets\text_field.dart                                   | Dart       |        -64 |          0 |         -3 |        -67 |
+| e:\Dev\Projects\HTI\jwt_auth\lib\widgets\ticket_card.dart                                  | Dart       |       -236 |         -2 |         -7 |       -245 |
+| e:\Dev\Projects\HTI\jwt_auth\linux\flutter\generated_plugin_registrant.cc                  | C++        |        -11 |         -4 |         -5 |        -20 |
+| e:\Dev\Projects\HTI\jwt_auth\linux\flutter\generated_plugin_registrant.h                   | C++        |         -5 |         -5 |         -6 |        -16 |
+| e:\Dev\Projects\HTI\jwt_auth\linux\main.cc                                                 | C++        |         -5 |          0 |         -2 |         -7 |
+| e:\Dev\Projects\HTI\jwt_auth\linux\my_application.cc                                       | C++        |        -74 |        -11 |        -20 |       -105 |
+| e:\Dev\Projects\HTI\jwt_auth\linux\my_application.h                                        | C++        |         -7 |         -7 |         -5 |        -19 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Flutter\GeneratedPluginRegistrant.swift                 | Swift      |        -18 |         -3 |         -4 |        -25 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\RunnerTests\RunnerTests.swift                           | Swift      |         -7 |         -2 |         -4 |        -13 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Runner\AppDelegate.swift                                | Swift      |         -8 |          0 |         -2 |        -10 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Runner\Assets.xcassets\AppIcon.appiconset\Contents.json | JSON       |        -68 |          0 |         -1 |        -69 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Runner\Base.lproj\MainMenu.xib                          | XML        |       -343 |          0 |         -1 |       -344 |
+| e:\Dev\Projects\HTI\jwt_auth\macos\Runner\MainFlutterWindow.swift                          | Swift      |        -12 |          0 |         -4 |        -16 |
+| e:\Dev\Projects\HTI\jwt_auth\pubspec.yaml                                                  | YAML       |        -43 |        -60 |        -17 |       -120 |
+| e:\Dev\Projects\HTI\jwt_auth\test\widget_test.dart                                         | Dart       |        -14 |        -10 |         -6 |        -30 |
+| e:\Dev\Projects\HTI\jwt_auth\web\index.html                                                | HTML       |        -38 |        -16 |         -6 |        -60 |
+| e:\Dev\Projects\HTI\jwt_auth\web\manifest.json                                             | JSON       |        -35 |          0 |         -1 |        -36 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\flutter\generated_plugin_registrant.cc                | C++        |        -15 |         -4 |         -5 |        -24 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\flutter\generated_plugin_registrant.h                 | C++        |         -5 |         -5 |         -6 |        -16 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\runner\flutter_window.cpp                             | C++        |        -49 |         -7 |        -16 |        -72 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\runner\flutter_window.h                               | C++        |        -20 |         -5 |         -9 |        -34 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\runner\main.cpp                                       | C++        |        -30 |         -4 |        -10 |        -44 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\runner\resource.h                                     | C++        |         -9 |         -6 |         -2 |        -17 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\runner\utils.cpp                                      | C++        |        -54 |         -2 |        -10 |        -66 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\runner\utils.h                                        | C++        |         -8 |         -6 |         -6 |        -20 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\runner\win32_window.cpp                               | C++        |       -210 |        -24 |        -55 |       -289 |
+| e:\Dev\Projects\HTI\jwt_auth\windows\runner\win32_window.h                                 | C++        |        -48 |        -31 |        -24 |       -103 |
+| Total                                                                                      |            |     -1,515 |       -278 |       -256 |     -2,049 |
++--------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

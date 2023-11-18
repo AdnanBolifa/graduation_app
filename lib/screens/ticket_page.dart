@@ -1,4 +1,3 @@
-import 'package:async/async.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +17,7 @@ import 'package:jwt_auth/services/location_services.dart';
 import 'package:jwt_auth/widgets/map_box.dart';
 import 'package:jwt_auth/widgets/text_field.dart';
 import 'package:jwt_auth/widgets/comment_section.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class AddTicket extends StatefulWidget {
   final Widget? comments;
@@ -36,8 +36,6 @@ class _AddTicketState extends State<AddTicket> {
   TextEditingController sectorController = TextEditingController();
   TextEditingController placeController = TextEditingController();
   TextEditingController commentController = TextEditingController();
-
-  final AsyncMemoizer _memoizer = AsyncMemoizer();
 
   String name = '';
   String account = '';
@@ -59,6 +57,12 @@ class _AddTicketState extends State<AddTicket> {
   late List<bool> problemCheckboxGroup;
   late List<bool> solutionCheckboxGroup;
 
+  TextEditingController locationController = TextEditingController();
+  final LocationService locationService = LocationService();
+  LocationData? locationData;
+  final Debouncer _debouncer = Debouncer();
+  bool isSaving = false;
+
   bool isLoadingLoc = false;
 
   void init() {
@@ -70,12 +74,11 @@ class _AddTicketState extends State<AddTicket> {
       account = accController.text = widget.ticket!.acc!;
       longitude = widget.ticket!.locationData!.longitude;
       latitude = widget.ticket!.locationData!.latitude;
-
-      _fetchData();
     }
     if (latitude != 0 && longitude != 0 && longitude != null) {
       locationController.text = '$latitude, $longitude';
     }
+    _fetchData();
   }
 
   @override
@@ -166,49 +169,12 @@ class _AddTicketState extends State<AddTicket> {
   }
 
   @override
-  void dispose() {
-    nameController.dispose();
-    phoneController.dispose();
-    placeController.dispose();
-    sectorController.dispose();
-    accController.dispose();
-    super.dispose();
-  }
-
-  TextEditingController locationController = TextEditingController();
-  final LocationService locationService = LocationService();
-  LocationData? locationData;
-  final Debouncer _debouncer = Debouncer();
-  bool isSaving = false;
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
         actions: [
-          Container(
-            margin: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: ElevatedButton(
-              onPressed: () {
-                _debouncer.run(() {
-                  _submitReport();
-                });
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-              child: isSaving
-                  ? const CircularProgressIndicator(
-                      color: Colors.black,
-                    )
-                  : const Text(
-                      'حفظ',
-                      style: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w300),
-                    ),
-            ),
-          ),
+          buildSaveButton(),
         ],
         title: const Text(
           'إضافة بلاغ',
@@ -217,438 +183,417 @@ class _AddTicketState extends State<AddTicket> {
         centerTitle: true,
       ),
       body: hasError
-          ? Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const Text(
-                      "حدث عطل ما!",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    ElevatedButton(
-                        onPressed: () {
-                          _retryFetchingData();
-                        },
-                        child: const Text('حاول مجددا'))
-                  ],
-                ),
-              ),
-            )
+          ? buildErrorBody()
           : FutureBuilder<bool>(
               future: checkInternetConnectivity(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Text("Error: ${snapshot.error}");
                 } else if (snapshot.data == false) {
-                  // No internet connection, display an error message.
-                  return Center(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          const Text(
-                            "لا يوجد اتصال بالانترنت",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          ElevatedButton(
-                              onPressed: () {
-                                _retryFetchingData();
-                              },
-                              child: const Text('حاول مجددا'))
-                        ],
-                      ),
-                    ),
-                  );
+                  return buildNoInternetBody();
                 } else {
-                  // Internet is available
-                  return SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          IgnorePointer(
-                            ignoring: widget.ticket == null || widget.ticket?.status == "inprogress" ? false : true,
-                            child: Column(children: [
-                              textReports(
-                                'الاسم',
-                                'خالد جمعة',
-                                name,
-                                nameController,
-                                (value) {
-                                  setState(() {
-                                    name = value;
-                                  });
-                                },
-                              ),
-
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: textReports(
-                                      'الهاتف',
-                                      '091XXXXXXX',
-                                      name,
-                                      phoneController,
-                                      (value) {
-                                        setState(() {
-                                          phone = value;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8.0),
-                                  Expanded(
-                                    child: textReports(
-                                      'الحساب',
-                                      'HTIX00000',
-                                      account,
-                                      accController,
-                                      (value) {
-                                        setState(() {
-                                          account = value;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: textReports(
-                                      'المكان',
-                                      'ش طرابلس',
-                                      place,
-                                      placeController,
-                                      (value) {
-                                        setState(() {
-                                          place = value;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: textReports('البرج', 'ZXX-SECXX', sector, sectorController, (value) {
-                                      setState(() {
-                                        sector = value;
-                                      });
-                                    }),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  // Dropdown for Towers
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.grey),
-                                      ),
-                                      child: DropdownButton<Tower>(
-                                        value: selectedTower,
-                                        items: towers.map((Tower tower) {
-                                          return DropdownMenuItem<Tower>(
-                                            value: tower,
-                                            child: Text(tower.name),
-                                          );
-                                        }).toList(),
-                                        onChanged: (Tower? newValue) {
-                                          setState(() {
-                                            selectedTower = newValue;
-                                            selectedSector = null;
-                                          });
-                                        },
-                                        hint: const Text(
-                                          'اختر برج',
-                                          textDirection: TextDirection.rtl,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  // Dropdown for Sectors
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: DropdownButton<Sector>(
-                                        isExpanded: true,
-                                        value: selectedSector,
-                                        items: selectedTower?.sectors?.map((Sector sector) {
-                                              return DropdownMenuItem<Sector>(
-                                                value: sector,
-                                                child: Text(
-                                                  sector.name,
-                                                ),
-                                              );
-                                            }).toList() ??
-                                            [],
-                                        onChanged: (Sector? newValue) {
-                                          setState(() {
-                                            selectedSector = newValue;
-                                          });
-                                        },
-                                        hint: const Text('اختر قطاع'),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 10),
-                              ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  minHeight: 100,
-                                ),
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      const Align(
-                                        alignment: Alignment.topCenter,
-                                        child: Text(
-                                          'المشاكل',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 15),
-                                        child: ListView.builder(
-                                          primary: false,
-                                          shrinkWrap: true,
-                                          itemCount: textTrueProblem.length,
-                                          itemBuilder: (context, index) {
-                                            return ListTile(
-                                              dense: true,
-                                              leading: Container(
-                                                width: 24,
-                                                height: 24,
-                                                alignment: Alignment.center,
-                                                child: const Icon(
-                                                  Icons.fiber_manual_record,
-                                                  size: 12,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                              title: Text(
-                                                textTrueProblem[index],
-                                                style: const TextStyle(fontSize: 16),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      Positioned(
-                                        right: 10,
-                                        bottom: 10,
-                                        child: Container(
-                                          width: 48,
-                                          height: 48,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[300],
-                                            borderRadius: BorderRadius.circular(5),
-                                          ),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              _memoizer.runOnce(() => _showBottomSheetProblem());
-                                            },
-                                            icon: const Icon(Icons.edit, color: Colors.black),
-                                            iconSize: 24,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              // Checkboxes - Group Solutions
-                              const SizedBox(height: 15.0),
-
-                              ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  minHeight: 100, // Set the default minimum height to 100
-                                ),
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      const Align(
-                                        alignment: Alignment.topCenter,
-                                        child: Text(
-                                          'الحلول',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 15),
-                                        child: ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: textTrueSolution.length,
-                                          itemBuilder: (context, index) {
-                                            return ListTile(
-                                              dense: true,
-                                              leading: Container(
-                                                width: 24,
-                                                height: 24,
-                                                alignment: Alignment.center,
-                                                child: const Icon(
-                                                  Icons.fiber_manual_record,
-                                                  size: 12,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                              title: Text(
-                                                textTrueSolution[index],
-                                                style: const TextStyle(fontSize: 16),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      Positioned(
-                                        right: 10,
-                                        bottom: 10,
-                                        child: Container(
-                                          width: 48,
-                                          height: 48,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[300],
-                                            borderRadius: BorderRadius.circular(5),
-                                          ),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              _memoizer.runOnce(() => _showBottomSheetSolution());
-                                            },
-                                            icon: const Icon(Icons.edit, color: Colors.black),
-                                            iconSize: 24,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-                              const SizedBox(height: 15),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: 120,
-                                    height: 55,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        _debouncer.run(() async {
-                                          try {
-                                            setState(() {
-                                              isLoadingLoc = true;
-                                            });
-
-                                            locationData = await locationService.getUserLocation();
-                                            locationController.text = '${locationData!.latitude}, ${locationData!.longitude}';
-                                            setState(() {
-                                              longitude = locationData!.longitude;
-                                              latitude = locationData!.latitude;
-                                            });
-                                          } catch (e) {
-                                            ApiService().handleErrorMessage(msg: 'Error fetching location: $e');
-                                            debugPrint("Error fetching location: $e");
-                                          } finally {
-                                            setState(() {
-                                              isLoadingLoc = false; // Set loading to false when done fetching data
-                                            });
-                                          }
-                                        });
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        minimumSize: const Size(60, 80),
-                                        backgroundColor: Colors.grey[300],
-                                      ),
-                                      child: Center(
-                                        child: isLoadingLoc
-                                            ? const CircularProgressIndicator() // Show loading indicator
-                                            : const Text(
-                                                "جلب احداثيات الموقع",
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w300,
-                                                ),
-                                              ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8.0),
-                                  Expanded(
-                                    child: Directionality(
-                                      textDirection: TextDirection.rtl,
-                                      child: TextField(
-                                        controller: locationController,
-                                        readOnly: true,
-                                        decoration: const InputDecoration(
-                                          labelText: 'احداثيات الموقع',
-                                          hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
-                                          hintText: 'xx.xxxx, xx.xxxx',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ]),
-                          ),
-                          // Text Fields
-
-                          //*Location Map
-                          const SizedBox(height: 10),
-                          if (latitude != 0 && longitude != 0 && longitude != null)
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.grey, width: 2),
-                              ),
-                              width: 400,
-                              height: 200,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: MapBox(latitude: latitude!, longitude: longitude!, zoomLvl: zoomLvl),
-                              ),
-                            ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-
-                          //* Comment section
-                          const SizedBox(height: 16.0),
-                          if (widget.ticket != null) CommentSection(id: widget.ticket!.id, user: widget.ticket!, comments: widget.ticket!.comments),
-                        ],
-                      ),
-                    ),
-                  );
+                  return problemsCheckbox.isEmpty && solutionsCheckbox.isEmpty && towers.isEmpty
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : buildBody();
                 }
               },
             ),
+    );
+  }
+
+  Widget buildErrorBody() {
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Text(
+              "حدث عطل ما!",
+              style: TextStyle(fontSize: 16),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _retryFetchingData();
+              },
+              child: const Text('حاول مجددا'),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildNoInternetBody() {
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Text(
+              "لا يوجد اتصال بالانترنت",
+              style: TextStyle(fontSize: 16),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _retryFetchingData();
+              },
+              child: const Text('حاول مجددا'),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildBody() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            IgnorePointer(
+              ignoring: widget.ticket == null || widget.ticket?.status == "inprogress" ? false : true,
+              child: Column(
+                children: [
+                  buildTicketFields(),
+                  const SizedBox(height: 10),
+                  buildContainer('المشاكل', textTrueProblem, () => _debouncer.run(() => _showBottomSheetProblem())),
+                  const SizedBox(height: 10),
+                  buildContainer('الحلول', textTrueSolution, () => _debouncer.run(() => _showBottomSheetSolution())),
+                  buildLocationSection(),
+                ],
+              ),
+            ),
+            buildLocationMap(),
+            //* Comment section
+            const SizedBox(height: 16.0),
+            if (widget.ticket != null) CommentSection(id: widget.ticket!.id, user: widget.ticket!, comments: widget.ticket!.comments),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container buildSaveButton() {
+    return Container(
+      margin: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: ElevatedButton(
+        onPressed: () {
+          _debouncer.run(() {
+            _submitReport();
+          });
+        },
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+        child: isSaving
+            ? const CircularProgressIndicator(
+                color: Colors.black,
+              )
+            : const Text(
+                'حفظ',
+                style: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w300),
+              ),
+      ),
+    );
+  }
+
+  Column buildTicketFields() {
+    return Column(
+      children: [
+        IgnorePointer(
+          ignoring: widget.ticket == null || widget.ticket?.status == "inprogress" ? false : true,
+          child: Column(
+            children: [
+              textReports('الاسم', 'خالد جمعة', name, nameController, (value) {
+                setState(() {
+                  name = value;
+                });
+              }),
+              buildRow(
+                  textReports('الهاتف', '091XXXXXXX', name, phoneController, (value) {
+                    setState(() {
+                      phone = value;
+                    });
+                  }),
+                  textReports('الحساب', 'HTIX00000', account, accController, (value) {
+                    setState(() {
+                      account = value;
+                    });
+                  })),
+              buildRow(
+                  textReports('المكان', 'ش طرابلس', place, placeController, (value) {
+                    setState(() {
+                      place = value;
+                    });
+                  }),
+                  textReports('البرج', 'ZXX-SECXX', sector, sectorController, (value) {
+                    setState(() {
+                      sector = value;
+                    });
+                  })),
+              buildTowersAndSectorsDropdowns(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Row buildRow(Widget leftChild, Widget rightChild) {
+    return Row(
+      children: [
+        Expanded(child: leftChild),
+        const SizedBox(width: 8.0),
+        Expanded(child: rightChild),
+      ],
+    );
+  }
+
+  Container buildTowersAndSectorsDropdowns() {
+    return Container(
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey),
+              ),
+              child: buildTowersDropdown(),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: buildSectorsDropdown(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container buildTowersDropdown() {
+    return Container(
+      child: DropdownButton<Tower>(
+        value: selectedTower,
+        items: towers.map((Tower tower) {
+          return DropdownMenuItem<Tower>(
+            value: tower,
+            child: Text(tower.name),
+          );
+        }).toList(),
+        onChanged: (Tower? newValue) {
+          setState(() {
+            selectedTower = newValue;
+            selectedSector = null;
+          });
+        },
+        hint: const Text(
+          'اختر برج',
+          textDirection: TextDirection.rtl,
+        ),
+      ),
+    );
+  }
+
+  Container buildSectorsDropdown() {
+    return Container(
+      child: DropdownButton<Sector>(
+        isExpanded: true,
+        value: selectedSector,
+        items: selectedTower?.sectors?.map((Sector sector) {
+              return DropdownMenuItem<Sector>(
+                value: sector,
+                child: Text(sector.name),
+              );
+            }).toList() ??
+            [],
+        onChanged: (Sector? newValue) {
+          setState(() {
+            selectedSector = newValue;
+          });
+        },
+        hint: const Text('اختر قطاع'),
+      ),
+    );
+  }
+
+  Widget buildContainer(String title, List<String> items, VoidCallback? onPressed) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: 100,
+      ),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topCenter,
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: ListView.builder(
+                primary: false,
+                shrinkWrap: true,
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    dense: true,
+                    leading: Container(
+                      width: 24,
+                      height: 24,
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.fiber_manual_record,
+                        size: 12,
+                        color: Colors.black,
+                      ),
+                    ),
+                    title: Text(
+                      items[index],
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Positioned(
+              right: 10,
+              bottom: 10,
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: IconButton(
+                  onPressed: onPressed,
+                  icon: const Icon(Icons.edit, color: Colors.black),
+                  iconSize: 24,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildLocationSection() {
+    return Column(
+      children: [
+        const SizedBox(height: 15),
+        Row(
+          children: [
+            SizedBox(
+              width: 120,
+              height: 55,
+              child: ElevatedButton(
+                onPressed: () {
+                  _debouncer.run(() async {
+                    try {
+                      setState(() {
+                        isLoadingLoc = true;
+                      });
+
+                      locationData = await locationService.getUserLocation();
+                      locationController.text = '${locationData!.latitude}, ${locationData!.longitude}';
+                      setState(() {
+                        longitude = locationData!.longitude;
+                        latitude = locationData!.latitude;
+                      });
+                    } catch (e) {
+                      // ApiService().handleErrorMessage(msg: 'Error fetching location: $e');
+                      openAppSettings();
+                      debugPrint("Error fetching location: $e");
+                    } finally {
+                      setState(() {
+                        isLoadingLoc = false; // Set loading to false when done fetching data
+                      });
+                    }
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(60, 80),
+                  backgroundColor: Colors.grey[300],
+                ),
+                child: Center(
+                  child: isLoadingLoc
+                      ? const CircularProgressIndicator() // Show loading indicator
+                      : const Text(
+                          "جلب احداثيات الموقع",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            Expanded(
+              child: Directionality(
+                textDirection: TextDirection.rtl,
+                child: TextField(
+                  controller: locationController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'احداثيات الموقع',
+                    hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
+                    hintText: 'xx.xxxx, xx.xxxx',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget buildLocationMap() {
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        if (latitude != 0 && longitude != 0 && longitude != null)
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey, width: 2),
+            ),
+            width: 400,
+            height: 200,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: MapBox(latitude: latitude!, longitude: longitude!, zoomLvl: zoomLvl),
+            ),
+          ),
+        const SizedBox(height: 15),
+      ],
     );
   }
 
@@ -657,9 +602,11 @@ class _AddTicketState extends State<AddTicket> {
       Fluttertoast.showToast(msg: "الرجاء ملء الحقول");
       return;
     }
-    List<int> selectedSolutionIds = solutionCheckboxGroup.asMap().entries.where((entry) => entry.value).map((entry) => solutionsCheckbox[entry.key].id).toList();
+    List<int> selectedSolutionIds =
+        solutionCheckboxGroup.asMap().entries.where((entry) => entry.value).map((entry) => solutionsCheckbox[entry.key].id).toList();
 
-    List<int> selectedProblemIds = problemCheckboxGroup.asMap().entries.where((entry) => entry.value).map((entry) => problemsCheckbox[entry.key].id).toList();
+    List<int> selectedProblemIds =
+        problemCheckboxGroup.asMap().entries.where((entry) => entry.value).map((entry) => problemsCheckbox[entry.key].id).toList();
     final connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult != ConnectivityResult.none) {
       try {

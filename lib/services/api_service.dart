@@ -15,8 +15,19 @@ import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 
 class ApiService {
-  Future<void> addReport(String name, acc, phone, place, sector, List<int> problems, List<int> solution, double longitude, double latitude) async {
-    final requestBody = {'name': name, 'phone': phone, 'account': acc, 'place': place, 'sector': sector, 'problem': problems, 'solutions': solution, 'longitude': longitude, 'latitude': latitude};
+  Future<void> addReport(
+      String name, acc, phone, place, sector, List<int> problems, List<int> solution, double longitude, double latitude) async {
+    final requestBody = {
+      'name': name,
+      'phone': phone,
+      'account': acc,
+      'place': place,
+      'sector': sector,
+      'problem': problems,
+      'solutions': solution,
+      'longitude': longitude,
+      'latitude': latitude
+    };
 
     await _performPostRequest(APIConfig.addUrl, requestBody);
   }

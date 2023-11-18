@@ -21,11 +21,10 @@ class SurveyPage extends StatefulWidget {
 
 class _SurveyPageState extends State<SurveyPage> {
   bool hasError = false;
-  Map<int, int> questionRatings = {};
-  List<String> answers = [];
-  List<MultiSurvey> survey = [];
+  Map<int, int> questionRatings = {}; //radio button
+  List<MultiSurvey> survey = []; //survey quesiton
   List<TextEditingController> notesControllers = [];
-  List<int> selectedRatings = [];
+  List<int> selectedRatings = []; //rating abr
   final Debouncer _debouncer = Debouncer();
   bool isSubmitting = false;
   @override
@@ -82,7 +81,13 @@ class _SurveyPageState extends State<SurveyPage> {
           : FutureBuilder(
               future: checkInternetConnectivity(),
               builder: (context, snapshot) {
-                return snapshot.hasError || snapshot.data == false ? _buildNoInternetWidget() : _buildSurveyWidget();
+                return snapshot.hasError || snapshot.data == false
+                    ? _buildNoInternetWidget()
+                    : survey.isEmpty
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : _buildSurveyWidget();
               },
             ),
     );
@@ -260,7 +265,8 @@ class _SurveyPageState extends State<SurveyPage> {
             }
           }
           //No null or empty values
-          bool isValid = answersList.every((answer) => answer['answer'] != null && answer['answer'].toString().isNotEmpty && answer['answer'] != 0);
+          bool isValid =
+              answersList.every((answer) => answer['answer'] != null && answer['answer'].toString().isNotEmpty && answer['answer'] != 0);
           if (!isValid) {
             Fluttertoast.showToast(msg: 'الرجاء تعبئة الحقول');
             setState(() {

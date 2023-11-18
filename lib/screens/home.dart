@@ -29,9 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool hasError = false;
   bool noTickets = false;
 
-  bool isPermission = false;
-  var checkAllPermissions = CheckPermission();
-
   @override
   void initState() {
     super.initState();
@@ -40,9 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
     getVersionInfo();
   }
 
+  bool isPermission = false;
+  var permissionManager = PermissionManager();
   _checkPermission() async {
-    var permission = await checkAllPermissions.isPermission();
-    if (permission) {
+    bool arePermissionsGranted = await permissionManager.checkAndRequestPermissions();
+    if (arePermissionsGranted) {
       setState(() {
         isPermission = true;
       });
@@ -56,7 +55,10 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         ticketList = originalList.where((ticket) {
           final queryLower = query.toLowerCase();
-          return ticket.userName.toLowerCase().contains(queryLower) || ticket.mobile.toLowerCase().contains(queryLower) || ticket.acc!.toLowerCase().contains(queryLower) || ticket.place!.toLowerCase().contains(queryLower);
+          return ticket.userName.toLowerCase().contains(queryLower) ||
+              ticket.mobile.toLowerCase().contains(queryLower) ||
+              ticket.acc!.toLowerCase().contains(queryLower) ||
+              ticket.place!.toLowerCase().contains(queryLower);
         }).toList();
       }
     });

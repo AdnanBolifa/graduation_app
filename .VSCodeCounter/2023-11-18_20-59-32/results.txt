@@ -1,0 +1,65 @@
+Date : 2023-11-18 20:59:32
+Directory : d:\Dev\Projects\Flutter\Tickets\Tickets\lib
+Total : 32 files,  2742 codes, 60 comments, 248 blanks, all 3050 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Dart     |         30 |      2,728 |         60 |        246 |      3,034 |
+| JSON     |          2 |         14 |          0 |          2 |         16 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                        | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                           |         32 |      2,742 |         60 |        248 |      3,050 |
+| . (Files)                                                                   |          1 |         24 |          0 |          4 |         28 |
+| assets                                                                      |          2 |         14 |          0 |          2 |         16 |
+| assets\translations                                                         |          2 |         14 |          0 |          2 |         16 |
+| data                                                                        |         10 |        208 |         10 |         46 |        264 |
+| screens                                                                     |          4 |      1,429 |         23 |         79 |      1,531 |
+| services                                                                    |          5 |        423 |         21 |         65 |        509 |
+| theme                                                                       |          3 |         18 |          1 |          5 |         24 |
+| widgets                                                                     |          7 |        626 |          5 |         47 |        678 |
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                    | language | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\assets\translations\ar_SA.json  | JSON     |          7 |          0 |          1 |          8 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\assets\translations\en_US.json  | JSON     |          7 |          0 |          1 |          8 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\api_config.dart            | Dart     |         21 |          6 |         10 |         37 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\comment_config.dart        | Dart     |         23 |          0 |          4 |         27 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\location_config.dart       | Dart     |          5 |          0 |          2 |          7 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\multi_answers.dart         | Dart     |         11 |          0 |          3 |         14 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\multi_survey_config.dart   | Dart     |         29 |          0 |          7 |         36 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\problem_config.dart        | Dart     |         11 |          0 |          3 |         14 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\sectors_config.dart        | Dart     |         13 |          0 |          2 |         15 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\solution_config.dart       | Dart     |         11 |          0 |          3 |         14 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\ticket_config.dart         | Dart     |         71 |          4 |          8 |         83 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\data\towers_config.dart         | Dart     |         13 |          0 |          4 |         17 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\main.dart                       | Dart     |         24 |          0 |          4 |         28 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\screens\home.dart               | Dart     |        289 |          4 |         17 |        310 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\screens\login.dart              | Dart     |         95 |          1 |          6 |        102 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\screens\survey_page.dart        | Dart     |        292 |          2 |         19 |        313 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\screens\ticket_page.dart        | Dart     |        753 |         16 |         37 |        806 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\services\api_service.dart       | Dart     |        300 |         12 |         38 |        350 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\services\auth_service.dart      | Dart     |         65 |          1 |         11 |         77 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\services\check_permissions.dart | Dart     |         26 |          8 |          8 |         42 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\services\debouncer.dart         | Dart     |         14 |          0 |          3 |         17 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\services\location_services.dart | Dart     |         18 |          0 |          5 |         23 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\theme\colors.dart               | Dart     |          7 |          0 |          2 |          9 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\theme\routes.dart               | Dart     |          4 |          1 |          1 |          6 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\theme\theme.dart                | Dart     |          7 |          0 |          2 |          9 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\comment_card.dart       | Dart     |         53 |          0 |          4 |         57 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\comment_section.dart    | Dart     |         87 |          1 |          8 |         96 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\download_dialog.dart    | Dart     |         89 |          1 |         13 |        103 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\error_dialog.dart       | Dart     |         29 |          0 |          4 |         33 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\map_box.dart            | Dart     |         60 |          1 |          4 |         65 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\text_field.dart         | Dart     |         69 |          0 |          3 |         72 |
+| d:\Dev\Projects\Flutter\Tickets\Tickets\lib\widgets\ticket_card.dart        | Dart     |        239 |          2 |         11 |        252 |
+| Total                                                                       |          |      2,742 |         60 |        248 |      3,050 |
++-----------------------------------------------------------------------------+----------+------------+------------+------------+------------+
