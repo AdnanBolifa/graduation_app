@@ -9,9 +9,11 @@ import 'package:jwt_auth/data/sectors_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
 import 'package:jwt_auth/data/solution_config.dart';
 import 'package:jwt_auth/data/towers_config.dart';
+import 'package:jwt_auth/main.dart';
 import 'package:jwt_auth/screens/home.dart';
 import 'package:jwt_auth/screens/survey_page.dart';
 import 'package:jwt_auth/services/api_service.dart';
+import 'package:jwt_auth/services/debouncer.dart';
 import 'package:jwt_auth/services/location_services.dart';
 import 'package:jwt_auth/widgets/map_box.dart';
 import 'package:jwt_auth/widgets/text_field.dart';
@@ -188,6 +190,7 @@ class _AddTicketState extends State<AddTicket> {
   TextEditingController locationController = TextEditingController();
   final LocationService locationService = LocationService();
   LocationData? locationData;
+  final Debouncer _debouncer = Debouncer();
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +205,9 @@ class _AddTicketState extends State<AddTicket> {
             ),
             child: ElevatedButton(
               onPressed: () {
-                _submitReport();
+                _debouncer.run(() {
+                  _submitReport();
+                });
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
               child: const Text(
@@ -739,21 +744,22 @@ class _AddTicketState extends State<AddTicket> {
             longitude: longitude,
             latitude: latitude);
       }
+      Fluttertoast.showToast(msg: 'جاري التحميل');
 
-      if (context.mounted) {
-        if (widget.ticket != null) {
-          //IT IS UPDATE
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) {
-            return SurveyPage(ticket: widget.ticket);
-          }));
-        } else {
-          //IT IS ADD
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) {
-            return const HomeScreen();
-          }));
-        }
+      if (widget.ticket != null) {
+        //IT IS UPDATE
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(
+            builder: (context) => SurveyPage(ticket: widget.ticket),
+          ),
+        );
+      } else {
+        //IT IS ADD
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(
+            builder: (context) => const HomeScreen(),
+          ),
+        );
       }
     } else {
       Fluttertoast.showToast(msg: "لا يوجد اتصال بالانترنت");

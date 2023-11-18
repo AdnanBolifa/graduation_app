@@ -1,4 +1,3 @@
-import 'package:async/async.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,7 @@ import 'package:jwt_auth/services/debouncer.dart';
 class SurveyPage extends StatefulWidget {
   final Ticket? ticket;
 
-  const SurveyPage({Key? key, this.ticket}) : super(key: key);
+  const SurveyPage({Key? key, required this.ticket}) : super(key: key);
 
   @override
   State<SurveyPage> createState() => _SurveyPageState();
@@ -266,7 +265,11 @@ class _SurveyPageState extends State<SurveyPage> {
             Fluttertoast.showToast(msg: 'الرجاء تعبئة الحقول');
             return;
           }
-          await ApiService().submitSurvey(widget.ticket!.id, answersList);
+          try {
+            await ApiService().submitSurvey(widget.ticket!.id, answersList);
+          } catch (e) {
+            ApiService().handleErrorMessage(msg: 'ERROR: $e');
+          }
           if (context.mounted) {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -291,7 +294,7 @@ class _SurveyPageState extends State<SurveyPage> {
           groupValue: questionRatings[question] ?? -1,
           onChanged: (int? rating) {
             setState(() {
-              questionRatings[question] = rating! - 1;
+              questionRatings[question] = rating!;
             });
           },
         ),

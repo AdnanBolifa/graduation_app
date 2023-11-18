@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -93,8 +92,7 @@ class ApiService {
         Fluttertoast.showToast(msg: 'Error parsing JSON: $e');
       }
     } else {
-      Fluttertoast.showToast(
-          msg: 'Request failed with status code: ${response.statusCode}');
+      handleErrorMessage(response: response);
       debugPrint('Response content: ${response.body}');
     }
 
@@ -130,9 +128,9 @@ class ApiService {
       "ticket": id,
       "answers_list": answersList,
     };
-    if (kDebugMode) {
-      print(jsonEncode(body));
-    }
+
+    debugPrint(jsonEncode(body));
+
     await _performPostRequest(APIConfig.submitSurveyUrl, body);
   }
 
@@ -223,13 +221,7 @@ class ApiService {
         throw Exception('Unsupported HTTP method: $method');
       }
 
-      if (response.statusCode == 200) {
-        _handleSuccessMessage('GET', response);
-      } else if (response.statusCode == 201) {
-        _handleSuccessMessage('POST', response);
-      } else if (response.statusCode == 204) {
-        _handleSuccessMessage('PUT', response);
-      } else if (response.statusCode == 401) {
+      if (response.statusCode == 401) {
         // Token expired, attempt to refresh
         if (retryCount < 3) {
           await AuthService().getNewAccessToken();
@@ -244,34 +236,17 @@ class ApiService {
             ),
           );
         }
-      } else {
-        _handleOtherSuccessMessage(response);
+      } else if (response.statusCode != 200 &&
+          response.statusCode != 201 &&
+          response.statusCode != 204) {
+        handleErrorMessage(response: response);
       }
       return response; // Return the response if you need it
     } catch (error) {
-      Fluttertoast.showToast(msg: "Request ERROR: $error");
+      handleErrorMessage(msg: 'Request ERROR: $error');
       debugPrint('Request ERROR: $error');
       rethrow;
     }
-  }
-
-  //API MESSAGES
-  void _handleSuccessMessage(String method, http.Response response) {
-    Fluttertoast.showToast(
-      msg: 'تمت $method البيانات بنجاح!',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      textColor: Colors.white,
-    );
-  }
-
-  void _handleOtherSuccessMessage(http.Response response) {
-    Fluttertoast.showToast(
-      msg: '${response.statusCode}',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      textColor: Colors.white,
-    );
   }
 
   //Parsing
@@ -335,5 +310,59 @@ class ApiService {
     } else {
       throw Exception('Failed to fetch solutions');
     }
+  }
+
+  void handleErrorMessage({String? msg, http.Response? response}) {
+    String responseBody = response?.body ?? '';
+    Map<String, dynamic>? parsedBody;
+
+    try {
+      // Attempt to parse the response body as JSON
+      parsedBody = jsonDecode(responseBody);
+    } catch (e) {
+      // Parsing failed, treat it as plain text
+    }
+
+    debugPrint('Status Code: ${response?.statusCode}');
+    debugPrint('Response Body:');
+
+    if (parsedBody != null) {
+      debugPrint(const JsonEncoder.withIndent('  ').convert(parsedBody));
+    } else {
+      debugPrint(responseBody);
+    }
+
+    showDialog(
+      context: navigatorKey.currentState!.context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Response Details'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Status Code: ${response?.statusCode}'),
+                const Text('Response Body:'),
+                if (parsedBody != null)
+                  Text(
+                    const JsonEncoder.withIndent('  ').convert(parsedBody),
+                    style: const TextStyle(fontFamily: 'monospace'),
+                  ),
+                if (parsedBody == null) Text(responseBody),
+                if (msg != null) Text(msg),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
