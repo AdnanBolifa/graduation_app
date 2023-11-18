@@ -100,68 +100,50 @@ class _AddTicketState extends State<AddTicket> {
   }
 
   void _fetchData() async {
-    // Check for internet connectivity
-    checkInternetConnectivity().then((hasInternet) {
+    try {
+      // Check for internet connectivity
+      bool hasInternet = await checkInternetConnectivity();
+
       if (hasInternet) {
-        //fetch towers:
-        ApiService().fetchTowers().then((t) {
-          setState(() {
-            towers = t;
-          });
-        }).catchError((error) {
-          _handleError();
-          if (kDebugMode) {
-            print("Error fetching problems: $error");
-          }
+        // Fetch towers
+        List<Tower> fetchedTowers = await ApiService().fetchTowers();
+        setState(() {
+          towers = fetchedTowers;
         });
 
-        // Fetch problems and handle errors
-        ApiService().fetchProblems().then((problems) {
-          setState(() {
-            problemsCheckbox = problems;
-            problemCheckboxGroup =
-                List.generate(problemsCheckbox.length, (index) => false);
+        // Fetch problems
+        List<Problem> fetchedProblems = await ApiService().fetchProblems();
+        setState(() {
+          problemsCheckbox = fetchedProblems;
+          problemCheckboxGroup = List.generate(problemsCheckbox.length, (index) => false);
 
-            if (widget.ticket != null) {
-              for (var item in widget.ticket!.problems!) {
-                for (var i = 0; i < problemsCheckbox.length; i++) {
-                  if (item == problemsCheckbox[i].id) {
-                    textTrueProblem.add(problemsCheckbox[i].name);
-                    problemCheckboxGroup[i] = true;
-                  }
+          if (widget.ticket != null) {
+            for (var item in widget.ticket!.problems!) {
+              for (var i = 0; i < problemsCheckbox.length; i++) {
+                if (item == problemsCheckbox[i].id) {
+                  textTrueProblem.add(problemsCheckbox[i].name);
+                  problemCheckboxGroup[i] = true;
                 }
               }
             }
-          });
-        }).catchError((error) {
-          _handleError();
-          if (kDebugMode) {
-            print("Error fetching problems: $error");
           }
         });
 
-        // Fetch solutions and handle errors
-        ApiService().fetchSolutions().then((solutions) {
-          setState(() {
-            solutionsCheckbox = solutions;
-            solutionCheckboxGroup =
-                List.generate(solutionsCheckbox.length, (index) => false);
+        // Fetch solutions
+        List<Solution> fetchedSolutions = await ApiService().fetchSolutions();
+        setState(() {
+          solutionsCheckbox = fetchedSolutions;
+          solutionCheckboxGroup = List.generate(solutionsCheckbox.length, (index) => false);
 
-            if (widget.ticket != null) {
-              for (var item in widget.ticket!.solutions!) {
-                for (var i = 0; i < solutionsCheckbox.length; i++) {
-                  if (item == solutionsCheckbox[i].id) {
-                    textTrueSolution.add(solutionsCheckbox[i].name);
-                    solutionCheckboxGroup[i] = true;
-                  }
+          if (widget.ticket != null) {
+            for (var item in widget.ticket!.solutions!) {
+              for (var i = 0; i < solutionsCheckbox.length; i++) {
+                if (item == solutionsCheckbox[i].id) {
+                  textTrueSolution.add(solutionsCheckbox[i].name);
+                  solutionCheckboxGroup[i] = true;
                 }
               }
             }
-          });
-        }).catchError((error) {
-          _handleError();
-          if (kDebugMode) {
-            print("Error fetching solutions: $error");
           }
         });
       } else {
@@ -169,7 +151,13 @@ class _AddTicketState extends State<AddTicket> {
           print("No internet connection.");
         }
       }
-    });
+    } catch (error) {
+      ApiService().handleErrorMessage(msg: 'Error fetching data: $error');
+      _handleError();
+      if (kDebugMode) {
+        print("Error fetching data: $error");
+      }
+    }
   }
 
   Future<bool> checkInternetConnectivity() async {
@@ -191,6 +179,7 @@ class _AddTicketState extends State<AddTicket> {
   final LocationService locationService = LocationService();
   LocationData? locationData;
   final Debouncer _debouncer = Debouncer();
+  bool isSaving = false;
 
   @override
   Widget build(BuildContext context) {
@@ -210,13 +199,14 @@ class _AddTicketState extends State<AddTicket> {
                 });
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-              child: const Text(
-                'حفظ',
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300),
-              ),
+              child: isSaving
+                  ? const CircularProgressIndicator(
+                      color: Colors.black,
+                    )
+                  : const Text(
+                      'حفظ',
+                      style: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w300),
+                    ),
             ),
           ),
         ],
@@ -276,10 +266,7 @@ class _AddTicketState extends State<AddTicket> {
                       child: Column(
                         children: [
                           IgnorePointer(
-                            ignoring: widget.ticket == null ||
-                                    widget.ticket?.status == "inprogress"
-                                ? false
-                                : true,
+                            ignoring: widget.ticket == null || widget.ticket?.status == "inprogress" ? false : true,
                             child: Column(children: [
                               textReports(
                                 'الاسم',
@@ -342,8 +329,7 @@ class _AddTicketState extends State<AddTicket> {
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
-                                    child: textReports('البرج', 'ZXX-SECXX',
-                                        sector, sectorController, (value) {
+                                    child: textReports('البرج', 'ZXX-SECXX', sector, sectorController, (value) {
                                       setState(() {
                                         sector = value;
                                       });
@@ -392,8 +378,7 @@ class _AddTicketState extends State<AddTicket> {
                                       child: DropdownButton<Sector>(
                                         isExpanded: true,
                                         value: selectedSector,
-                                        items: selectedTower?.sectors
-                                                ?.map((Sector sector) {
+                                        items: selectedTower?.sectors?.map((Sector sector) {
                                               return DropdownMenuItem<Sector>(
                                                 value: sector,
                                                 child: Text(
@@ -458,8 +443,7 @@ class _AddTicketState extends State<AddTicket> {
                                               ),
                                               title: Text(
                                                 textTrueProblem[index],
-                                                style: const TextStyle(
-                                                    fontSize: 16),
+                                                style: const TextStyle(fontSize: 16),
                                               ),
                                             );
                                           },
@@ -473,16 +457,13 @@ class _AddTicketState extends State<AddTicket> {
                                           height: 48,
                                           decoration: BoxDecoration(
                                             color: Colors.grey[300],
-                                            borderRadius:
-                                                BorderRadius.circular(5),
+                                            borderRadius: BorderRadius.circular(5),
                                           ),
                                           child: IconButton(
                                             onPressed: () {
-                                              _memoizer.runOnce(() =>
-                                                  _showBottomSheetProblem());
+                                              _memoizer.runOnce(() => _showBottomSheetProblem());
                                             },
-                                            icon: const Icon(Icons.edit,
-                                                color: Colors.black),
+                                            icon: const Icon(Icons.edit, color: Colors.black),
                                             iconSize: 24,
                                           ),
                                         ),
@@ -496,8 +477,7 @@ class _AddTicketState extends State<AddTicket> {
 
                               ConstrainedBox(
                                 constraints: const BoxConstraints(
-                                  minHeight:
-                                      100, // Set the default minimum height to 100
+                                  minHeight: 100, // Set the default minimum height to 100
                                 ),
                                 child: Container(
                                   width: MediaQuery.of(context).size.width,
@@ -537,8 +517,7 @@ class _AddTicketState extends State<AddTicket> {
                                               ),
                                               title: Text(
                                                 textTrueSolution[index],
-                                                style: const TextStyle(
-                                                    fontSize: 16),
+                                                style: const TextStyle(fontSize: 16),
                                               ),
                                             );
                                           },
@@ -552,16 +531,13 @@ class _AddTicketState extends State<AddTicket> {
                                           height: 48,
                                           decoration: BoxDecoration(
                                             color: Colors.grey[300],
-                                            borderRadius:
-                                                BorderRadius.circular(5),
+                                            borderRadius: BorderRadius.circular(5),
                                           ),
                                           child: IconButton(
                                             onPressed: () {
-                                              _memoizer.runOnce(() =>
-                                                  _showBottomSheetSolution());
+                                              _memoizer.runOnce(() => _showBottomSheetSolution());
                                             },
-                                            icon: const Icon(Icons.edit,
-                                                color: Colors.black),
+                                            icon: const Icon(Icons.edit, color: Colors.black),
                                             iconSize: 24,
                                           ),
                                         ),
@@ -579,29 +555,24 @@ class _AddTicketState extends State<AddTicket> {
                                     height: 55,
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        _memoizer.runOnce(() async {
+                                        _debouncer.run(() async {
                                           try {
                                             setState(() {
                                               isLoadingLoc = true;
                                             });
 
-                                            locationData = await locationService
-                                                .getUserLocation();
-                                            locationController.text =
-                                                '${locationData!.latitude}, ${locationData!.longitude}';
+                                            locationData = await locationService.getUserLocation();
+                                            locationController.text = '${locationData!.latitude}, ${locationData!.longitude}';
                                             setState(() {
-                                              longitude =
-                                                  locationData!.longitude;
+                                              longitude = locationData!.longitude;
                                               latitude = locationData!.latitude;
                                             });
                                           } catch (e) {
-                                            // Handle any errors that might occur during location fetching
-                                            debugPrint(
-                                                "Error fetching location: $e");
+                                            ApiService().handleErrorMessage(msg: 'Error fetching location: $e');
+                                            debugPrint("Error fetching location: $e");
                                           } finally {
                                             setState(() {
-                                              isLoadingLoc =
-                                                  false; // Set loading to false when done fetching data
+                                              isLoadingLoc = false; // Set loading to false when done fetching data
                                             });
                                           }
                                         });
@@ -634,12 +605,10 @@ class _AddTicketState extends State<AddTicket> {
                                         readOnly: true,
                                         decoration: const InputDecoration(
                                           labelText: 'احداثيات الموقع',
-                                          hintStyle: TextStyle(
-                                              fontSize: 14, color: Colors.grey),
+                                          hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
                                           hintText: 'xx.xxxx, xx.xxxx',
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(5)),
+                                            borderRadius: BorderRadius.all(Radius.circular(5)),
                                           ),
                                         ),
                                       ),
@@ -653,23 +622,17 @@ class _AddTicketState extends State<AddTicket> {
 
                           //*Location Map
                           const SizedBox(height: 10),
-                          if (latitude != 0 &&
-                              longitude != 0 &&
-                              longitude != null)
+                          if (latitude != 0 && longitude != 0 && longitude != null)
                             Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                border:
-                                    Border.all(color: Colors.grey, width: 2),
+                                border: Border.all(color: Colors.grey, width: 2),
                               ),
                               width: 400,
                               height: 200,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: MapBox(
-                                    latitude: latitude!,
-                                    longitude: longitude!,
-                                    zoomLvl: zoomLvl),
+                                child: MapBox(latitude: latitude!, longitude: longitude!, zoomLvl: zoomLvl),
                               ),
                             ),
                           const SizedBox(
@@ -678,11 +641,7 @@ class _AddTicketState extends State<AddTicket> {
 
                           //* Comment section
                           const SizedBox(height: 16.0),
-                          if (widget.ticket != null)
-                            CommentSection(
-                                id: widget.ticket!.id,
-                                user: widget.ticket!,
-                                comments: widget.ticket!.comments),
+                          if (widget.ticket != null) CommentSection(id: widget.ticket!.id, user: widget.ticket!, comments: widget.ticket!.comments),
                         ],
                       ),
                     ),
@@ -694,72 +653,54 @@ class _AddTicketState extends State<AddTicket> {
   }
 
   void _submitReport() async {
-    if (name.isEmpty ||
-        account.isEmpty ||
-        phone.isEmpty ||
-        place.isEmpty ||
-        sector.isEmpty ||
-        locationController.text.isEmpty) {
+    if (name.isEmpty || account.isEmpty || phone.isEmpty || place.isEmpty || sector.isEmpty || locationController.text.isEmpty) {
       Fluttertoast.showToast(msg: "الرجاء ملء الحقول");
       return;
     }
-    List<int> selectedSolutionIds = solutionCheckboxGroup
-        .asMap()
-        .entries
-        .where((entry) => entry.value)
-        .map((entry) => solutionsCheckbox[entry.key].id)
-        .toList();
+    List<int> selectedSolutionIds = solutionCheckboxGroup.asMap().entries.where((entry) => entry.value).map((entry) => solutionsCheckbox[entry.key].id).toList();
 
-    List<int> selectedProblemIds = problemCheckboxGroup
-        .asMap()
-        .entries
-        .where((entry) => entry.value)
-        .map((entry) => problemsCheckbox[entry.key].id)
-        .toList();
+    List<int> selectedProblemIds = problemCheckboxGroup.asMap().entries.where((entry) => entry.value).map((entry) => problemsCheckbox[entry.key].id).toList();
     final connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult != ConnectivityResult.none) {
-      if (widget.ticket == null) {
-        await ApiService().addReport(
-            name,
-            account,
-            phone,
-            place,
-            //('${selectedTower!.name}-${selectedSector!.name}'),
-            sector,
-            selectedProblemIds,
-            selectedSolutionIds,
-            locationData!.longitude!,
-            locationData!.latitude!);
-      } else {
-        await ApiService().updateReport(
-            name: nameController.text,
-            acc: accController.text,
-            phone: phoneController.text,
-            place: placeController.text,
-            sector:
-                sector, //('${selectedTower!.name}-${selectedSector!.name}'),
-            id: widget.ticket!.id,
-            problems: selectedProblemIds,
-            solution: selectedSolutionIds,
-            longitude: longitude,
-            latitude: latitude);
-      }
-      Fluttertoast.showToast(msg: 'جاري التحميل');
-
-      if (widget.ticket != null) {
-        //IT IS UPDATE
-        navigatorKey.currentState?.push(
-          MaterialPageRoute(
-            builder: (context) => SurveyPage(ticket: widget.ticket),
-          ),
-        );
-      } else {
-        //IT IS ADD
-        navigatorKey.currentState?.push(
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
-          ),
-        );
+      try {
+        Fluttertoast.showToast(msg: 'جاري الحفظ');
+        if (widget.ticket == null) {
+          await ApiService().addReport(
+              name,
+              account,
+              phone,
+              place,
+              //('${selectedTower!.name}-${selectedSector!.name}'),
+              sector,
+              selectedProblemIds,
+              selectedSolutionIds,
+              locationData!.longitude!,
+              locationData!.latitude!);
+          navigatorKey.currentState?.push(
+            MaterialPageRoute(
+              builder: (context) => const HomeScreen(),
+            ),
+          );
+        } else {
+          await ApiService().updateReport(
+              name: nameController.text,
+              acc: accController.text,
+              phone: phoneController.text,
+              place: placeController.text,
+              sector: sector, //('${selectedTower!.name}-${selectedSector!.name}'),
+              id: widget.ticket!.id,
+              problems: selectedProblemIds,
+              solution: selectedSolutionIds,
+              longitude: longitude,
+              latitude: latitude);
+          navigatorKey.currentState?.push(
+            MaterialPageRoute(
+              builder: (context) => SurveyPage(ticket: widget.ticket),
+            ),
+          );
+        }
+      } catch (e) {
+        ApiService().handleErrorMessage(msg: "_submitReport ERROR: $e");
       }
     } else {
       Fluttertoast.showToast(msg: "لا يوجد اتصال بالانترنت");

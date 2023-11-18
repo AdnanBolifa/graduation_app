@@ -5,6 +5,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/data/multi_survey_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
+import 'package:jwt_auth/main.dart';
 import 'package:jwt_auth/screens/home.dart';
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/services/debouncer.dart';
@@ -26,6 +27,7 @@ class _SurveyPageState extends State<SurveyPage> {
   List<TextEditingController> notesControllers = [];
   List<int> selectedRatings = [];
   final Debouncer _debouncer = Debouncer();
+  bool isSubmitting = false;
   @override
   void initState() {
     super.initState();
@@ -54,6 +56,7 @@ class _SurveyPageState extends State<SurveyPage> {
         selectedRatings = List.generate(survey.length, (index) => 0);
       });
     } catch (e) {
+      ApiService().handleErrorMessage(msg: 'Error fetching survey data: $e');
       if (kDebugMode) {
         print("Error fetching survey data: $e");
       }
@@ -79,9 +82,7 @@ class _SurveyPageState extends State<SurveyPage> {
           : FutureBuilder(
               future: checkInternetConnectivity(),
               builder: (context, snapshot) {
-                return snapshot.hasError || snapshot.data == false
-                    ? _buildNoInternetWidget()
-                    : _buildSurveyWidget();
+                return snapshot.hasError || snapshot.data == false ? _buildNoInternetWidget() : _buildSurveyWidget();
               },
             ),
     );
@@ -233,8 +234,10 @@ class _SurveyPageState extends State<SurveyPage> {
         padding: const EdgeInsets.all(16.0),
       ),
       onPressed: () {
+        setState(() {
+          isSubmitting = true;
+        });
         _debouncer.run(() async {
-          debugPrint('Debounced');
           List<Map<String, dynamic>> answersList = [];
           for (int i = 0; i < survey.length; i++) {
             if (survey[i].type == 'multi') {
@@ -257,12 +260,12 @@ class _SurveyPageState extends State<SurveyPage> {
             }
           }
           //No null or empty values
-          bool isValid = answersList.every((answer) =>
-              answer['answer'] != null &&
-              answer['answer'].toString().isNotEmpty &&
-              answer['answer'] != 0);
+          bool isValid = answersList.every((answer) => answer['answer'] != null && answer['answer'].toString().isNotEmpty && answer['answer'] != 0);
           if (!isValid) {
             Fluttertoast.showToast(msg: 'الرجاء تعبئة الحقول');
+            setState(() {
+              isSubmitting = false;
+            });
             return;
           }
           try {
@@ -270,19 +273,24 @@ class _SurveyPageState extends State<SurveyPage> {
           } catch (e) {
             ApiService().handleErrorMessage(msg: 'ERROR: $e');
           }
-          if (context.mounted) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
-              ),
-            );
-          }
+          setState(() {
+            isSubmitting = false;
+          });
+          navigatorKey.currentState?.push(
+            MaterialPageRoute(
+              builder: (context) => const HomeScreen(),
+            ),
+          );
         });
       },
-      child: const Text(
-        'إرسال',
-        style: TextStyle(fontSize: 18),
-      ),
+      child: isSubmitting
+          ? const CircularProgressIndicator(
+              color: Colors.white,
+            )
+          : const Text(
+              'إرسال',
+              style: TextStyle(fontSize: 18),
+            ),
     );
   }
 

@@ -38,16 +38,21 @@ Widget textReports(String label, String hint, String value,
 
 Widget textField(
     String label, String hint, TextEditingController onChangedCallback,
-    {double? width, double? height, bool? isHide}) {
+    {double? width,
+    double? height,
+    bool isHide = false,
+    bool isRight = false}) {
   return Column(
     children: [
       Directionality(
-        textDirection: TextDirection.rtl,
+        textDirection: isRight == true && isRight != false
+            ? TextDirection.rtl
+            : TextDirection.ltr,
         child: SizedBox(
           width: width,
           height: height,
           child: TextField(
-            obscureText: isHide ?? false,
+            obscureText: isHide,
             controller: onChangedCallback,
             decoration: InputDecoration(
               labelText: label,

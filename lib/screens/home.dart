@@ -21,8 +21,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
-  
   final TextEditingController searchController = TextEditingController();
   List<Ticket> ticketList = [];
   List<Ticket> originalList = [];
@@ -43,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _checkPermission() async {
-    var permission = await checkAllPermissions.isStoragePermission();
+    var permission = await checkAllPermissions.isPermission();
     if (permission) {
       setState(() {
         isPermission = true;
@@ -58,10 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         ticketList = originalList.where((ticket) {
           final queryLower = query.toLowerCase();
-          return ticket.userName.toLowerCase().contains(queryLower) ||
-              ticket.mobile.toLowerCase().contains(queryLower) ||
-              ticket.acc!.toLowerCase().contains(queryLower) ||
-              ticket.place!.toLowerCase().contains(queryLower);
+          return ticket.userName.toLowerCase().contains(queryLower) || ticket.mobile.toLowerCase().contains(queryLower) || ticket.acc!.toLowerCase().contains(queryLower) || ticket.place!.toLowerCase().contains(queryLower);
         }).toList();
       }
     });
@@ -77,21 +72,20 @@ class _HomeScreenState extends State<HomeScreen> {
       });
 
       try {
-        if (context.mounted) {
-          final users = await ApiService().getReports(context);
-          if (users != null && users.isNotEmpty) {
-            setState(() {
-              ticketList = users;
-              originalList = ticketList;
-            });
-          } else if (users!.isEmpty) {
-            _noTickets();
-          } else {
-            _handleError();
-            throw Exception('ApiService returned null or an error response.');
-          }
+        final users = await ApiService().getReports();
+        if (users != null && users.isNotEmpty) {
+          setState(() {
+            ticketList = users;
+            originalList = ticketList;
+          });
+        } else if (users!.isEmpty) {
+          _noTickets();
+        } else {
+          _handleError();
+          throw Exception('ApiService returned null or an error response.');
         }
       } catch (e) {
+        ApiService().handleErrorMessage(msg: "Error while refreshing data: $e");
         debugPrint('Error while refreshing data: $e');
         // Set a flag to indicate an error occurred.
         _handleError();
@@ -173,8 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 "يوجد تحديث متوفر!",
                 textDirection: TextDirection.rtl,
               ),
-              content: const Text("هل تريد تحديث التطبيق؟",
-                  textDirection: TextDirection.rtl),
+              content: const Text("هل تريد تحديث التطبيق؟", textDirection: TextDirection.rtl),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -214,8 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
             if (value == 'logout') {
               searchController.clear();
               AuthService().logout();
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const LoginPage()));
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LoginPage()));
             }
           },
           itemBuilder: (context) => [
@@ -283,8 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ? () {
                                         Navigator.of(context).push(
                                           MaterialPageRoute(
-                                            builder: (context) => AddTicket(
-                                                ticket: ticketList[index]),
+                                            builder: (context) => AddTicket(ticket: ticketList[index]),
                                           ),
                                         );
                                       }

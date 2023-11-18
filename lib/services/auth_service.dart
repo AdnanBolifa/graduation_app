@@ -62,7 +62,8 @@ class AuthService {
         storeTokens(response.body);
       } else {
         debugPrint('============FAILD to refresh============');
-        throw Exception('Failed to log in');
+        debugPrint('BODY: ${response.body}: \nstatus code: ${response.statusCode}\n Header: ${response.request} \n Request: ${response.request}\n Request: ${response.headers}');
+        return;
       }
     });
   }
