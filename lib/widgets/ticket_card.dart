@@ -2,16 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/data/location_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
-import 'package:jwt_auth/screens/ticket_page.dart';
+import 'package:jwt_auth/main.dart';
+import 'package:jwt_auth/screens/home.dart';
 import 'package:jwt_auth/services/api_service.dart';
+import 'package:jwt_auth/services/debouncer.dart';
 import 'package:jwt_auth/services/location_services.dart';
 import 'package:jwt_auth/theme/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class TicketCard extends StatelessWidget {
+class TicketCard extends StatefulWidget {
   final Ticket ticket;
 
   const TicketCard({Key? key, required this.ticket}) : super(key: key);
+
+  @override
+  State<TicketCard> createState() => _TicketCardState();
+}
+
+class _TicketCardState extends State<TicketCard> {
+  //final AsyncMemoizer _memoizer = AsyncMemoizer();
+  final Debouncer _debouncer = Debouncer();
+  bool isMissionStarted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,19 +42,18 @@ class TicketCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: Container(
-                decoration:
-                    ticket.status == 'notstarted' || ticket.status == 'done'
-                        ? BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
-                          )
-                        : null,
+                decoration: widget.ticket.status == 'done'
+                    ? BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                    : null,
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${ticket.acc!} - ${ticket.userName}',
+                      '${widget.ticket.acc!} - ${widget.ticket.userName}',
                       style: const TextStyle(
                         fontSize: 18,
                         color: Colors.black,
@@ -52,7 +62,7 @@ class TicketCard extends StatelessWidget {
                       textDirection: TextDirection.ltr,
                     ),
                     Text(
-                      ticket.mobile,
+                      widget.ticket.mobile,
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black,
@@ -61,7 +71,7 @@ class TicketCard extends StatelessWidget {
                       textDirection: TextDirection.ltr,
                     ),
                     Text(
-                      "[${ticket.createdAt!}]",
+                      "[${widget.ticket.createdAt!}]",
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.black,
@@ -70,16 +80,13 @@ class TicketCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      'المكان:  ${ticket.place!}',
-                      style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
+                      'المكان:  ${widget.ticket.place!}',
+                      style: const TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold),
                       textDirection: TextDirection.ltr,
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      ticket.lastComment!,
+                      widget.ticket.lastComment!,
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.black,
@@ -96,85 +103,87 @@ class TicketCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               shape: BoxShape.rectangle,
                             ),
-                            child: ticket.status != 'done'
-                                //! Start button has long delay
+                            child: widget.ticket.status != 'done'
                                 ? ElevatedButton(
-                                    style: ticket.status == 'notstarted'
-                                        ? ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                AppColors.primaryColor)
+                                    style: widget.ticket.status == 'notstarted'
+                                        ? ElevatedButton.styleFrom(backgroundColor: AppColors.primaryColor)
                                         : ElevatedButton.styleFrom(
                                             backgroundColor: Colors.grey[300],
                                           ),
-                                    onPressed: ticket.status == 'notstarted'
+                                    onPressed: widget.ticket.status == 'notstarted'
                                         ? () {
-                                            final snackBar = SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  InkWell(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    onTap: () {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .hideCurrentSnackBar();
-                                                    },
-                                                    child: const Icon(
-                                                      Icons.close, // Close icon
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                  SnackBarAction(
-                                                    label: 'نعم',
-                                                    onPressed: () async {
-                                                      locationData =
-                                                          await locationService
-                                                              .getUserLocation();
-                                                      ApiService().startTimer(
-                                                          locationData!,
-                                                          ticket.id);
-                                                      if (context.mounted) {
-                                                        Navigator.of(context)
-                                                            .push(
-                                                          MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                AddTicket(
-                                                                    ticket:
-                                                                        ticket),
+                                            showModalBottomSheet(
+                                              context: context,
+                                              isScrollControlled: true,
+                                              builder: (BuildContext context) {
+                                                return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+                                                  return SingleChildScrollView(
+                                                    child: Container(
+                                                      padding: const EdgeInsets.all(16),
+                                                      child: Column(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          const Text(
+                                                            'هل أنت متأكد من بدء المهمة؟',
+                                                            style: TextStyle(fontSize: 18),
                                                           ),
-                                                        );
-                                                      }
-                                                    },
-                                                  ),
-                                                  const Expanded(
-                                                    child: Text(
-                                                      'هل انت متأكد من بدأ المهمة؟',
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                      style: TextStyle(
-                                                          fontSize: 16),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
+                                                          const SizedBox(height: 16),
+                                                          ElevatedButton(
+                                                            onPressed: () {
+                                                              _debouncer.run(() async {
+                                                                try {
+                                                                  setState(() {
+                                                                    isMissionStarted = true;
+                                                                  });
 
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(snackBar);
+                                                                  locationData = await locationService.getUserLocation();
+                                                                  ApiService().startTimer(locationData!, widget.ticket.id);
+
+                                                                  setState(() {
+                                                                    isMissionStarted = false;
+                                                                  });
+
+                                                                  if (context.mounted) {
+                                                                    Navigator.of(context).pop();
+                                                                    navigatorKey.currentState?.push(
+                                                                      MaterialPageRoute(
+                                                                        builder: (context) => const HomeScreen(),
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                } catch (error) {
+                                                                  ApiService().handleErrorMessage(msg: "ERROR: $error");
+                                                                }
+                                                              });
+                                                            },
+                                                            child: isMissionStarted
+                                                                ? const CircularProgressIndicator(
+                                                                    color: Colors.white,
+                                                                  )
+                                                                : const Text('نعم'),
+                                                          ),
+                                                          const SizedBox(height: 16),
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(context).pop();
+                                                            },
+                                                            child: const Text('إلغاء'),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                });
+                                              },
+                                            );
                                           }
                                         : () {
-                                            Fluttertoast.showToast(
-                                                msg:
-                                                    'هذه المهمة قد بدأت بالفعل');
+                                            Fluttertoast.showToast(msg: 'هذه المهمة قد بدأت بالفعل');
                                           },
-                                    child: Text('بدأ المهمة الان',
-                                        style: ticket.status == 'notstarted'
-                                            ? const TextStyle(
-                                                fontWeight: FontWeight.bold)
-                                            : TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.grey[600])),
+                                    child: Text(
+                                      'بدأ المهمة الان',
+                                      style: widget.ticket.status == 'notstarted' ? const TextStyle(fontWeight: FontWeight.bold) : TextStyle(fontWeight: FontWeight.bold, color: Colors.grey[600]),
+                                    ),
                                   )
                                 : null,
                           ),
@@ -192,10 +201,10 @@ class TicketCard extends StatelessWidget {
                                     shape: BoxShape.rectangle,
                                     color: Colors.grey[300],
                                   ),
-                                  child: ticket.status == 'inprogress'
+                                  child: widget.ticket.status != 'done'
                                       ? IconButton(
                                           onPressed: () {
-                                            _makePhoneCall(ticket.mobile);
+                                            _makePhoneCall(widget.ticket.mobile);
                                           },
                                           icon: const Icon(
                                             Icons.phone,
@@ -223,9 +232,7 @@ class TicketCard extends StatelessWidget {
                 height: 15,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: ticket.status == 'inprogress'
-                      ? inProgress
-                      : (ticket.status == 'notstarted' ? idle : closed),
+                  color: widget.ticket.status == 'inprogress' ? inProgress : (widget.ticket.status == 'notstarted' ? idle : closed),
                 ),
               ),
             ),

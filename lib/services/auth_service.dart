@@ -10,6 +10,7 @@ class AuthService {
 
   Future<String> login(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
+      Fluttertoast.showToast(msg: 'بيانات فارعة!');
       throw ArgumentError('Email and password must not be empty');
     }
     final response = await http.post(Uri.parse(APIConfig.loginUrl), body: {
@@ -57,10 +58,12 @@ class AuthService {
 
       if (response.statusCode == 200) {
         debugPrint('=============================');
-        debugPrint('refreshed');
+        debugPrint('=refreshed= \n new access: ${response.body}');
         storeTokens(response.body);
       } else {
-        throw Exception('Failed to log in');
+        debugPrint('============FAILD to refresh============');
+        debugPrint('BODY: ${response.body}: \nstatus code: ${response.statusCode}\n Header: ${response.request} \n Request: ${response.request}\n Request: ${response.headers}');
+        return;
       }
     });
   }

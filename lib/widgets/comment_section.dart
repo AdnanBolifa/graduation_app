@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jwt_auth/data/comment_config.dart';
 import 'package:jwt_auth/data/ticket_config.dart';
 import 'package:jwt_auth/services/api_service.dart';
+import 'package:jwt_auth/services/debouncer.dart';
 import 'package:jwt_auth/theme/colors.dart';
 import 'package:jwt_auth/widgets/comment_card.dart';
 import 'package:jwt_auth/widgets/text_field.dart';
@@ -11,15 +12,15 @@ class CommentSection extends StatefulWidget {
 
   final Ticket user;
   final int id;
-  const CommentSection(
-      {Key? key, required this.id, this.comments, required this.user})
-      : super(key: key);
+  const CommentSection({Key? key, required this.id, this.comments, required this.user}) : super(key: key);
 
   @override
   State<CommentSection> createState() => _CommentSectionState();
 }
 
 class _CommentSectionState extends State<CommentSection> {
+  //final AsyncMemoizer _memoizer = AsyncMemoizer();
+  final Debouncer _debouncer = Debouncer();
   final TextEditingController commentController = TextEditingController();
 
   @override
@@ -44,22 +45,28 @@ class _CommentSectionState extends State<CommentSection> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ElevatedButton(
-                onPressed: () async {
-                  // Replace with your actual ApiService method
-                  ApiService().updateReport(
-                    comment: commentController.text,
-                    id: widget.id,
-                  );
+                onPressed: () {
+                  _debouncer.run(() async {
+                    try {
+                      setState(() {
+                        widget.comments?.add(CommentData(
+                          ticket: 0,
+                          comment: commentController.text,
+                          createdAt: 'الأن',
+                          createdBy: 'انت',
+                        ));
+                      });
 
-                  setState(() {
-                    widget.comments?.add(CommentData(
-                      ticket: 0,
-                      comment: commentController.text,
-                      createdAt: 'الأن',
-                      createdBy: 'انت',
-                    ));
+                      await ApiService().updateReport(
+                        comment: commentController.text,
+                        id: widget.id,
+                      );
+
+                      commentController.clear();
+                    } catch (error) {
+                      ApiService().handleErrorMessage(msg: 'ERROR posting comments $error');
+                    }
                   });
-                  commentController.clear();
                 },
                 style: ButtonStyle(
                   minimumSize: MaterialStateProperty.all<Size>(
@@ -76,7 +83,7 @@ class _CommentSectionState extends State<CommentSection> {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: textField('تعليق', 'اضف تعليق', commentController),
+                child: textField('تعليق', 'اضف تعليق', commentController, isRight: true),
               ),
             ],
           ),

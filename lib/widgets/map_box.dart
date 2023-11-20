@@ -28,6 +28,7 @@ class _MapBoxState extends State<MapBox> {
                 options: MapOptions(
                   initialCenter: LatLng(widget.latitude, widget.longitude),
                   initialZoom: widget.zoomLvl,
+                  // ignore: deprecated_member_use
                   interactiveFlags:
                       InteractiveFlag.pinchZoom | InteractiveFlag.drag,
                 ),

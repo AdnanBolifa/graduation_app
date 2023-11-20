@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/screens/home.dart';
+import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 import 'package:jwt_auth/theme/colors.dart';
 import 'package:jwt_auth/widgets/text_field.dart';
@@ -40,15 +41,13 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 25,
               ),
-              textField('إسم المستخدم', 'Hello, World', emailController),
-              textField('كلمة المرور', 'sudo su', passwordController,
-                  isHide: true),
+              textField('إسم المستخدم', 'Hello, World', emailController, isRight: false),
+              textField('كلمة المرور', 'sudo su', passwordController, isHide: true, isRight: false),
               ElevatedButton(
                 onPressed: isLoading
                     ? null
                     : () async {
-                        var connectivityResult =
-                            await (Connectivity().checkConnectivity());
+                        var connectivityResult = await (Connectivity().checkConnectivity());
                         if (connectivityResult == ConnectivityResult.none) {
                           // No internet connection
                           Fluttertoast.showToast(
@@ -64,9 +63,9 @@ class _LoginPageState extends State<LoginPage> {
                           isLoading = true;
                         });
                         try {
-                          final token = await AuthService().login(
-                              emailController.text, passwordController.text);
+                          final token = await AuthService().login(emailController.text, passwordController.text);
 
+                          await AuthService().storeTokens(token);
                           if (context.mounted) {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -74,9 +73,8 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             );
                           }
-                          await AuthService().storeTokens(token);
                         } catch (e) {
-                          throw ('Login failed: $e');
+                          ApiService().handleErrorMessage(msg: "LOGIN ERROR: $e");
                         } finally {
                           setState(() {
                             isLoading = false;
@@ -84,10 +82,8 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       },
                 style: ButtonStyle(
-                  minimumSize:
-                      MaterialStateProperty.all<Size>(const Size(150, 50)),
-                  backgroundColor:
-                      MaterialStateProperty.all<Color>(AppColors.primaryColor),
+                  minimumSize: MaterialStateProperty.all<Size>(const Size(150, 50)),
+                  backgroundColor: MaterialStateProperty.all<Color>(AppColors.primaryColor),
                 ),
                 child: isLoading
                     ? const CircularProgressIndicator()
