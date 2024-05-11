@@ -1,308 +1,274 @@
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:jwt_auth/data/api_config.dart';
-import 'package:jwt_auth/data/ticket_config.dart';
-import 'package:jwt_auth/widgets/download_dialog.dart';
-import 'package:jwt_auth/screens/ticket_page.dart';
+import 'package:http/http.dart' as http;
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/services/auth_service.dart';
-import 'package:jwt_auth/services/check_permissions.dart';
-import 'package:jwt_auth/theme/colors.dart';
-import 'package:jwt_auth/widgets/error_dialog.dart';
-import '../widgets/ticket_card.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatelessWidget {
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController sexController = TextEditingController();
+  final TextEditingController cpController = TextEditingController();
+  final TextEditingController trestbpsController = TextEditingController();
+  final TextEditingController cholController = TextEditingController();
+  final TextEditingController fbsController = TextEditingController();
+  final TextEditingController restecgController = TextEditingController();
+  final TextEditingController thalachController = TextEditingController();
+  final TextEditingController exangController = TextEditingController();
+  final TextEditingController oldpeakController = TextEditingController();
+  final TextEditingController slopeController = TextEditingController();
+  final TextEditingController caController = TextEditingController();
+  final TextEditingController thalController = TextEditingController();
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController searchController = TextEditingController();
-  List<Ticket> ticketList = [];
-  List<Ticket> originalList = [];
-  bool isRefreshing = false;
-  bool noInternet = false;
-  bool hasError = false;
-  bool noTickets = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchReports();
-    _checkPermission();
-    getVersionInfo();
-  }
-
-  bool isPermission = false;
-  var permissionManager = PermissionManager();
-  _checkPermission() async {
-    bool arePermissionsGranted = await permissionManager.checkAndRequestPermissions();
-    if (arePermissionsGranted) {
-      setState(() {
-        isPermission = true;
-      });
-    }
-  }
-
-  void _filterUsers(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        ticketList = List.from(originalList);
-      } else {
-        ticketList = originalList.where((ticket) {
-          final queryLower = query.toLowerCase();
-          return ticket.userName.toLowerCase().contains(queryLower) ||
-              ticket.mobile.toLowerCase().contains(queryLower) ||
-              ticket.acc!.toLowerCase().contains(queryLower) ||
-              ticket.place!.toLowerCase().contains(queryLower);
-        }).toList();
-      }
-    });
-  }
-
-  Future<void> _fetchReports() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-
-    if (connectivityResult != ConnectivityResult.none) {
-      setState(() {
-        isRefreshing = true;
-        noInternet = false;
-      });
-
-      try {
-        final users = await ApiService().getReports();
-        if (users != null && users.isNotEmpty) {
-          setState(() {
-            ticketList = users;
-            originalList = ticketList;
-          });
-        } else if (users!.isEmpty) {
-          _noTickets();
-        } else {
-          _handleError();
-          throw Exception('ApiService returned null or an error response.');
-        }
-      } catch (e) {
-        ApiService().handleErrorMessage(msg: "Error while refreshing data: $e");
-        debugPrint('Error while refreshing data: $e');
-        // Set a flag to indicate an error occurred.
-        _handleError();
-      } finally {
-        setState(() {
-          isRefreshing = false;
-        });
-      }
-    } else {
-      setState(() {
-        noInternet = true;
-      });
-      Fluttertoast.showToast(msg: 'لايوجد انترنت');
-      // Set a flag to indicate an error occurred.
-      _handleError();
-    }
-  }
-
-  void _handleError() {
-    setState(() {
-      hasError = true;
-    });
-  }
-
-  void _noTickets() {
-    setState(() {
-      noTickets = true;
-    });
-  }
-
-  void _retryFetchingData() {
-    // Clear the error flag and attempt to fetch data again.
-    setState(() {
-      hasError = false;
-      noTickets = false;
-    });
-    _fetchReports();
-  }
-
-  void getVersionInfo() async {
-    try {
-      //PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      String? url = await ApiService().checkAndUpdateVersion(APIConfig.version);
-      if (url != null) {
-        Fluttertoast.showToast(
-          msg: "تم العثور على تحديث!",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 3,
-          backgroundColor: Colors.grey,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-        if (context.mounted) {
-          bool updateConfirmed = await showUpdateConfirmationDialog(context);
-          if (updateConfirmed && context.mounted) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context) {
-                return DownloadProgressDialog(url: url);
-              },
-            );
-          }
-        }
-      }
-    } catch (e) {
-      ErrorDialog(line1: 'Catch Error: $e');
-      debugPrint('Error getting version info: $e');
-    }
-  }
-
-  Future<bool> showUpdateConfirmationDialog(BuildContext context) async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text(
-                "يوجد تحديث متوفر!",
-                textDirection: TextDirection.rtl,
-              ),
-              content: const Text("هل تريد تحديث التطبيق؟", textDirection: TextDirection.rtl),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  child: const Text("نعم"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: const Text("لا"),
-                ),
-              ],
-            );
-          },
-        ) ??
-        false;
+  HomeScreen({Key? key}) : super(key: key);
+  void main() {
+    runApp(MaterialApp(
+      home: HomeScreen(),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("الرئيسية"),
-        centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () {
-                getVersionInfo();
+        automaticallyImplyLeading: false,
+        title: const Text('Heart Disease Predictor'),
+      ),
+      endDrawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_circle),
+              title: const Text('Profile'),
+              onTap: () {
+                // Navigate to profile page
               },
-              icon: const Icon(Icons.download))
-        ],
-        leading: PopupMenuButton(
-          icon: const Icon(Icons.menu),
-          onSelected: (value) {
-            if (value == 'logout') {
-              searchController.clear();
-              AuthService().logout();
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LoginPage()));
-            }
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'logout',
-              child: Text('تسجيل الخروج'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                // Navigate to settings page
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: const Text('History'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/history');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('Logout'),
+              onTap: () {
+                AuthService().logout();
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const LoginPage()));
+              },
             ),
           ],
         ),
       ),
-      body: noInternet || hasError || noTickets
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    noTickets
-                        ? "😎 لا يوجد لديك اي بلاغ "
-                        : noInternet
-                            ? "لا يوجد اتصال بالإنترنت"
-                            : "حدث خطأ يرجى تسجيل الخروج",
-                    style: const TextStyle(fontSize: 22),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _retryFetchingData,
-                    child: const Text(
-                      "إعادة المحاولة",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : RefreshIndicator(
-              onRefresh: _fetchReports,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: TextField(
-                      controller: searchController,
-                      onChanged: _filterUsers,
-                      decoration: InputDecoration(
-                        hintTextDirection: TextDirection.rtl,
-                        hintText: 'البحث عن كل شيء',
-                        labelText: 'بحث',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        prefixIcon: const Icon(Icons.search),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ticketList.isEmpty
-                        ? const Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : ListView.builder(
-                            itemCount: ticketList.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: ticketList[index].status != 'done'
-                                    ? () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) => AddTicket(ticket: ticketList[index]),
-                                          ),
-                                        );
-                                      }
-                                    : null,
-                                child: TicketCard(
-                                  ticket: ticketList[index],
-                                ),
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              ),
-            ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const AddTicket(),
-            ),
-          );
-        },
-        backgroundColor: AppColors.primaryColor,
-        child: const Icon(Icons.add),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: HomeForm(
+          ageController: ageController,
+          sexController: sexController,
+          cpController: cpController,
+          trestbpsController: trestbpsController,
+          cholController: cholController,
+          fbsController: fbsController,
+          restecgController: restecgController,
+          thalachController: thalachController,
+          exangController: exangController,
+          oldpeakController: oldpeakController,
+          slopeController: slopeController,
+          caController: caController,
+          thalController: thalController,
+        ),
       ),
+    );
+  }
+}
+
+class HomeForm extends StatelessWidget {
+  final TextEditingController ageController;
+  final TextEditingController sexController;
+  final TextEditingController cpController;
+  final TextEditingController trestbpsController;
+  final TextEditingController cholController;
+  final TextEditingController fbsController;
+  final TextEditingController restecgController;
+  final TextEditingController thalachController;
+  final TextEditingController exangController;
+  final TextEditingController oldpeakController;
+  final TextEditingController slopeController;
+  final TextEditingController caController;
+  final TextEditingController thalController;
+
+  const HomeForm({
+    super.key,
+    required this.ageController,
+    required this.sexController,
+    required this.cpController,
+    required this.trestbpsController,
+    required this.cholController,
+    required this.fbsController,
+    required this.restecgController,
+    required this.thalachController,
+    required this.exangController,
+    required this.oldpeakController,
+    required this.slopeController,
+    required this.caController,
+    required this.thalController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        TextField(
+          controller: ageController,
+          decoration: const InputDecoration(labelText: 'Age'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: sexController,
+          decoration: const InputDecoration(labelText: 'Sex'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: cpController,
+          decoration: const InputDecoration(labelText: 'Chest Pain Type (cp)'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: trestbpsController,
+          decoration: const InputDecoration(
+              labelText: 'Resting Blood Pressure (trestbps)'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: cholController,
+          decoration:
+              const InputDecoration(labelText: 'Serum Cholesterol (chol)'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: fbsController,
+          decoration:
+              const InputDecoration(labelText: 'Fasting Blood Sugar (fbs)'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: restecgController,
+          decoration: const InputDecoration(
+              labelText: 'Resting Electrocardiographic Results (restecg)'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: thalachController,
+          decoration: const InputDecoration(
+              labelText: 'Maximum Heart Rate Achieved (thalach)'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: exangController,
+          decoration: const InputDecoration(
+              labelText: 'Exercise Induced Angina (exang)'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: oldpeakController,
+          decoration: const InputDecoration(
+              labelText:
+                  'ST Depression Induced by Exercise Relative to Rest (oldpeak)'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: slopeController,
+          decoration: const InputDecoration(
+              labelText: 'Slope of the Peak Exercise ST Segment (slope)'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: caController,
+          decoration: const InputDecoration(
+              labelText: 'Number of Major Vessels Colored by Flourosopy (ca)'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: thalController,
+          decoration: const InputDecoration(labelText: 'Thalassemia (thal)'),
+          keyboardType: TextInputType.number,
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            await _submitData(context);
+          },
+          child: const Text('Submit'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _submitData(BuildContext context) async {
+    http.Response response = await ApiService.submitData(
+      context,
+      ageController,
+      sexController,
+      cpController,
+      trestbpsController,
+      cholController,
+      fbsController,
+      restecgController,
+      thalachController,
+      exangController,
+      oldpeakController,
+      slopeController,
+      caController,
+      thalController,
+    );
+
+    if (response.statusCode == 200) {
+      int prediction = ApiService.getPrediction(response);
+      _showPredictionDialog(context, prediction);
+    } else {
+      ApiService.handleError(response);
+    }
+  }
+
+  void _showPredictionDialog(BuildContext context, int prediction) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Prediction'),
+          content: Text('Prediction: $prediction'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

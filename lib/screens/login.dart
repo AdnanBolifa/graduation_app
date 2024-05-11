@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(height: 150),
-              Image.asset('lib/assets/hti_logo.png'),
+              //Image.asset('lib/assets/hti_logo.png'),
               const SizedBox(
                 height: 50,
               ),
@@ -41,13 +41,16 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 25,
               ),
-              textField('إسم المستخدم', 'Hello, World', emailController, isRight: false),
-              textField('كلمة المرور', 'sudo su', passwordController, isHide: true, isRight: false),
+              textField('إسم المستخدم', 'Hello, World', emailController,
+                  isRight: false),
+              textField('كلمة المرور', 'sudo su', passwordController,
+                  isHide: true, isRight: false),
               ElevatedButton(
                 onPressed: isLoading
                     ? null
                     : () async {
-                        var connectivityResult = await (Connectivity().checkConnectivity());
+                        var connectivityResult =
+                            await (Connectivity().checkConnectivity());
                         if (connectivityResult == ConnectivityResult.none) {
                           // No internet connection
                           Fluttertoast.showToast(
@@ -63,18 +66,20 @@ class _LoginPageState extends State<LoginPage> {
                           isLoading = true;
                         });
                         try {
-                          final token = await AuthService().login(emailController.text, passwordController.text);
+                          final token = await AuthService().login(
+                              emailController.text, passwordController.text);
 
                           await AuthService().storeTokens(token);
                           if (context.mounted) {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => const HomeScreen(),
+                                builder: (context) => HomeScreen(),
                               ),
                             );
                           }
                         } catch (e) {
-                          ApiService().handleErrorMessage(msg: "LOGIN ERROR: $e");
+                          ApiService()
+                              .handleErrorMessage(msg: "LOGIN ERROR: $e");
                         } finally {
                           setState(() {
                             isLoading = false;
@@ -82,8 +87,10 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       },
                 style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all<Size>(const Size(150, 50)),
-                  backgroundColor: MaterialStateProperty.all<Color>(AppColors.primaryColor),
+                  minimumSize:
+                      MaterialStateProperty.all<Size>(const Size(150, 50)),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(AppColors.primaryColor),
                 ),
                 child: isLoading
                     ? const CircularProgressIndicator()

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/data/api_config.dart';
+import 'package:jwt_auth/data/history_config.dart';
 import 'package:jwt_auth/data/location_config.dart';
 import 'package:jwt_auth/data/multi_survey_config.dart';
 import 'package:jwt_auth/data/problem_config.dart';
@@ -14,9 +15,179 @@ import 'package:jwt_auth/main.dart';
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 
+class Features {
+  final int age;
+  final int sex;
+  final int cp;
+  final int trestbps;
+  final int chol;
+  final int fbs;
+  final int restecg;
+  final int thalach;
+  final int exang;
+  final double oldpeak;
+  final int slope;
+  final int ca;
+  final int thal;
+
+  Features({
+    required this.age,
+    required this.sex,
+    required this.cp,
+    required this.trestbps,
+    required this.chol,
+    required this.fbs,
+    required this.restecg,
+    required this.thalach,
+    required this.exang,
+    required this.oldpeak,
+    required this.slope,
+    required this.ca,
+    required this.thal,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'age': age,
+      'sex': sex,
+      'cp': cp,
+      'trestbps': trestbps,
+      'chol': chol,
+      'fbs': fbs,
+      'restecg': restecg,
+      'thalach': thalach,
+      'exang': exang,
+      'oldpeak': oldpeak,
+      'slope': slope,
+      'ca': ca,
+      'thal': thal,
+    };
+  }
+}
+
 class ApiService {
+  static Future<http.Response> submitData(
+    BuildContext context,
+    TextEditingController ageController,
+    TextEditingController sexController,
+    TextEditingController cpController,
+    TextEditingController trestbpsController,
+    TextEditingController cholController,
+    TextEditingController fbsController,
+    TextEditingController restecgController,
+    TextEditingController thalachController,
+    TextEditingController exangController,
+    TextEditingController oldpeakController,
+    TextEditingController slopeController,
+    TextEditingController caController,
+    TextEditingController thalController,
+  ) async {
+    final Features data = Features(
+      age: int.parse(ageController.text),
+      sex: int.parse(sexController.text),
+      cp: int.parse(cpController.text),
+      trestbps: int.parse(trestbpsController.text),
+      chol: int.parse(cholController.text),
+      fbs: int.parse(fbsController.text),
+      restecg: int.parse(restecgController.text),
+      thalach: int.parse(thalachController.text),
+      exang: int.parse(exangController.text),
+      oldpeak: double.parse(oldpeakController.text),
+      slope: int.parse(slopeController.text),
+      ca: int.parse(caController.text),
+      thal: int.parse(thalController.text),
+    );
+    final accessToken = await AuthService().getAccessToken();
+    final Uri url = Uri.parse('http://192.168.1.102:8000/api/predict/');
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(data.toJson()),
+    );
+    return response;
+  }
+
+  static int getPrediction(http.Response response) {
+    Map<String, dynamic> responseBody = jsonDecode(response.body);
+    return responseBody['prediction'];
+  }
+
+  static void handleError(http.Response response) {
+    String responseBody = response.body;
+    Map<String, dynamic>? parsedBody;
+
+    try {
+      // Attempt to parse the response body as JSON
+      parsedBody = jsonDecode(responseBody);
+    } catch (e) {
+      // Parsing failed, treat it as plain text
+    }
+
+    debugPrint('Status Code: ${response.statusCode}');
+    debugPrint('Response Body:');
+
+    if (parsedBody != null) {
+      debugPrint(const JsonEncoder.withIndent('  ').convert(parsedBody));
+    } else {
+      debugPrint(responseBody);
+    }
+
+    showDialog(
+      context: navigatorKey.currentState!.context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Response Details'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Status Code: ${response.statusCode}'),
+                const Text('Response Body:'),
+                if (parsedBody != null)
+                  Text(
+                    const JsonEncoder.withIndent('  ').convert(parsedBody),
+                    style: const TextStyle(fontFamily: 'monospace'),
+                  ),
+                if (parsedBody == null) Text(responseBody),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+            TextButton(
+              onPressed: () {
+                navigatorKey.currentState?.push(
+                  MaterialPageRoute(
+                    builder: (context) => const LoginPage(),
+                  ),
+                );
+              },
+              child: const Text('تسجيل الخروج'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> addReport(
-      String name, acc, phone, place, sector, List<int> problems, List<int> solution, double longitude, double latitude) async {
+      String name,
+      acc,
+      phone,
+      place,
+      sector,
+      List<int> problems,
+      List<int> solution,
+      double longitude,
+      double latitude) async {
     final requestBody = {
       'name': name,
       'phone': phone,
@@ -91,6 +262,24 @@ class ApiService {
     return null;
   }
 
+  Future<List<History>?> getHistory() async {
+    final response = await _performGetRequest(APIConfig.historyUrl);
+    if (response.statusCode == 200) {
+      try {
+        final List<dynamic> historyJson = jsonDecode(response.body);
+        final List<History> history =
+            historyJson.map((history) => History.fromJson(history)).toList();
+        return history;
+      } catch (e) {
+        debugPrint('Error parsing JSON: $e');
+        return null;
+      }
+    } else {
+      debugPrint('Response content: ${response.body}');
+      return null;
+    }
+  }
+
   Future<List<Problem>> fetchProblems() async {
     final response = await _performGetRequest(APIConfig.problemsUrl);
     return _parseProblemsResponse(response);
@@ -114,7 +303,8 @@ class ApiService {
     return _parseSurveyResponse(response);
   }
 
-  Future<void> submitSurvey(int id, List<Map<String, dynamic>> answersList) async {
+  Future<void> submitSurvey(
+      int id, List<Map<String, dynamic>> answersList) async {
     final body = {
       "ticket": id,
       "answers_list": answersList,
@@ -131,40 +321,6 @@ class ApiService {
     return _parseTowerResponse(responseTower, responseSec);
   }
 
-  Future<String?> checkAndUpdateVersion(String frontendVersion) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${APIConfig.checkUpdates}?frontend_version=$frontendVersion'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-
-        if (data['status']) {
-          // There is a new version, and the APK URL is available
-          String version = data['version'];
-          String apkUrl = data['url'];
-          debugPrint('New version available: $version');
-          debugPrint('APK URL: $apkUrl');
-          return apkUrl; // Return the APK URL
-        } else {
-          Fluttertoast.showToast(msg: 'لا يوجد تحديثات في الوقت الحالي!');
-          return null;
-        }
-      } else {
-        Fluttertoast.showToast(msg: 'Error: ${response.statusCode}');
-        debugPrint('Error: ${response.statusCode}');
-        return null;
-      }
-    } catch (e) {
-      Fluttertoast.showToast(msg: 'Error: $e');
-      debugPrint('Error: $e');
-      return null;
-    }
-  }
-
   //API CALLS
   Future<http.Response> _performGetRequest(String url) async {
     return _performRequest(url, 'GET', null);
@@ -179,7 +335,8 @@ class ApiService {
   }
 
   //helper functions
-  Future<http.Response> _performRequest(String url, String method, dynamic body, {int retryCount = 0}) async {
+  Future<http.Response> _performRequest(String url, String method, dynamic body,
+      {int retryCount = 0}) async {
     try {
       final accessToken = await AuthService().getAccessToken();
       final Map<String, String> headers = {
@@ -223,7 +380,9 @@ class ApiService {
             builder: (context) => const LoginPage(),
           ),
         );
-      } else if (response.statusCode != 200 && response.statusCode != 201 && response.statusCode != 204) {
+      } else if (response.statusCode != 200 &&
+          response.statusCode != 201 &&
+          response.statusCode != 204) {
         handleErrorMessage(response: response);
       }
       return response; // Return the response if you need it
@@ -259,18 +418,21 @@ class ApiService {
     }
   }
 
-  List<Tower> _parseTowerResponse(http.Response responseTower, http.Response responseSec) {
+  List<Tower> _parseTowerResponse(
+      http.Response responseTower, http.Response responseSec) {
     if (responseSec.statusCode == 200) {
       final secResponseMap = jsonDecode(utf8.decode(responseSec.bodyBytes));
       final List<dynamic> secResults = secResponseMap['results'];
       final sectors = secResults.map((item) => Sector.fromJson(item)).toList();
 
       if (responseTower.statusCode == 200) {
-        final towerResponseMap = jsonDecode(utf8.decode(responseTower.bodyBytes));
+        final towerResponseMap =
+            jsonDecode(utf8.decode(responseTower.bodyBytes));
         final List<dynamic> towerResults = towerResponseMap['results'];
         final towers = towerResults.map((item) {
           final tower = Tower.fromJson(item);
-          tower.sectors = sectors.where((sec) => sec.tower == tower.id).toList();
+          tower.sectors =
+              sectors.where((sec) => sec.tower == tower.id).toList();
           return tower;
         }).toList();
 

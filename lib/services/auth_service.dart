@@ -62,7 +62,8 @@ class AuthService {
         storeTokens(response.body);
       } else {
         debugPrint('============FAILD to refresh============');
-        debugPrint('BODY: ${response.body}: \nstatus code: ${response.statusCode}\n Header: ${response.request} \n Request: ${response.request}\n Request: ${response.headers}');
+        debugPrint(
+            'BODY: ${response.body}: \nstatus code: ${response.statusCode}\n Header: ${response.request} \n Request: ${response.request}\n Request: ${response.headers}');
         return;
       }
     });
