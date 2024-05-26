@@ -35,10 +35,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Heart Disease Predictor',
+      title: 'Heart Disease Predictor#',
       initialRoute: accessToken != null ? '/' : '/login',
       routes: {
-        '/': (context) => HomeScreen(),
+        '/': (context) => const HomeScreen(),
         '/history': (context) => const HistoryPage(),
         '/login': (context) => const LoginPage(),
       },

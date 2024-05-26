@@ -1,58 +1,61 @@
-class History {
-  final int id;
-  final int age;
-  final int sex;
-  final int cp;
-  final int trestbps;
-  final int chol;
-  final int fbs;
-  final int restecg;
-  final int thalach;
-  final int exang;
-  final double oldpeak;
-  final int slope;
-  final int ca;
-  final int thal;
-  final String createdAt;
-  final int user;
+// ignore_for_file: non_constant_identifier_names
 
-  History({
-    required this.id,
-    required this.age,
-    required this.sex,
-    required this.cp,
-    required this.trestbps,
-    required this.chol,
-    required this.fbs,
-    required this.restecg,
-    required this.thalach,
-    required this.exang,
-    required this.oldpeak,
-    required this.slope,
-    required this.ca,
-    required this.thal,
-    required this.createdAt,
-    required this.user,
-  });
+class History {
+  final String patientName;
+  final int sex; // Male
+  final int age; // Age in years
+  final int currentSmoker; // Currently smoking
+  final int cigsPerDay; // Number of cigarettes smoked per day
+  final int BPMeds; // Taking blood pressure medication
+  final int prevalentStroke; // No history of stroke
+  final int prevalentHyp; // Prevalent hypertension
+  final int diabetes; // Diabetic
+  final int totChol; // Total cholesterol level in mg/dL
+  final int sysBP; // Systolic blood pressure in mmHg
+  final int diaBP; // Diastolic blood pressure in mmHg
+  final double BMI; // Body mass index
+  final int heartRate; // Heart rate in beats per minute
+  final int glucose; // Glucose level in mg/dL
+  final bool? status;
+  final int prediction_result;
+
+  History(
+      {required this.patientName,
+      required this.sex,
+      required this.age,
+      required this.currentSmoker,
+      required this.cigsPerDay,
+      required this.BPMeds,
+      required this.prevalentStroke,
+      required this.prevalentHyp,
+      required this.diabetes,
+      required this.totChol,
+      required this.sysBP,
+      required this.diaBP,
+      required this.BMI,
+      required this.heartRate,
+      required this.glucose,
+      required this.status,
+      required this.prediction_result});
 
   factory History.fromJson(Map<String, dynamic> json) {
     return History(
-      id: json['id'],
-      age: json['age'],
-      sex: json['sex'],
-      cp: json['cp'],
-      trestbps: json['trestbps'],
-      chol: json['chol'],
-      fbs: json['fbs'],
-      restecg: json['restecg'],
-      thalach: json['thalach'],
-      exang: json['exang'],
-      oldpeak: json['oldpeak'],
-      slope: json['slope'],
-      ca: json['ca'],
-      thal: json['thal'],
-      createdAt: json['created_at'],
-      user: json['user'],
-    );
+        patientName: json['patientName'] ?? 'Unknown',
+        sex: json['sex'],
+        age: json['age'],
+        currentSmoker: json['currentSmoker'],
+        cigsPerDay: json['cigsPerDay'],
+        BPMeds: json['BPMeds'],
+        prevalentStroke: json['prevalentStroke'],
+        prevalentHyp: json['prevalentHyp'],
+        diabetes: json['diabetes'],
+        totChol: json['totChol'],
+        sysBP: json['sysBP'],
+        diaBP: json['diaBP'],
+        BMI: json['BMI'].toDouble(),
+        heartRate: json['heartRate'],
+        glucose: json['glucose'],
+        status: json['doctor_feedback'],
+        prediction_result: json['TenYearCHD']);
   }
 }

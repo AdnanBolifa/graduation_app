@@ -1,247 +1,179 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 
-class HomeScreen extends StatelessWidget {
-  final TextEditingController ageController = TextEditingController();
-  final TextEditingController sexController = TextEditingController();
-  final TextEditingController cpController = TextEditingController();
-  final TextEditingController trestbpsController = TextEditingController();
-  final TextEditingController cholController = TextEditingController();
-  final TextEditingController fbsController = TextEditingController();
-  final TextEditingController restecgController = TextEditingController();
-  final TextEditingController thalachController = TextEditingController();
-  final TextEditingController exangController = TextEditingController();
-  final TextEditingController oldpeakController = TextEditingController();
-  final TextEditingController slopeController = TextEditingController();
-  final TextEditingController caController = TextEditingController();
-  final TextEditingController thalController = TextEditingController();
+void main() {
+  runApp(const HeartDiseasePredictorApp());
+}
 
-  HomeScreen({Key? key}) : super(key: key);
-  void main() {
-    runApp(MaterialApp(
-      home: HomeScreen(),
-    ));
-  }
+class HeartDiseasePredictorApp extends StatelessWidget {
+  const HeartDiseasePredictorApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Heart Disease Predictor'),
-      ),
-      endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_circle),
-              title: const Text('Profile'),
-              onTap: () {
-                // Navigate to profile page
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
-              onTap: () {
-                // Navigate to settings page
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.history),
-              title: const Text('History'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/history');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('Logout'),
-              onTap: () {
-                AuthService().logout();
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const LoginPage()));
-              },
-            ),
-          ],
+    return const MaterialApp(
+      home: HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          bottom: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.bloodtype)),
+              Tab(icon: Icon(Icons.fastfood)),
+            ],
+          ),
+          automaticallyImplyLeading: false,
+          title: const Text('Heart Disease Predictor'),
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: HomeForm(
-          ageController: ageController,
-          sexController: sexController,
-          cpController: cpController,
-          trestbpsController: trestbpsController,
-          cholController: cholController,
-          fbsController: fbsController,
-          restecgController: restecgController,
-          thalachController: thalachController,
-          exangController: exangController,
-          oldpeakController: oldpeakController,
-          slopeController: slopeController,
-          caController: caController,
-          thalController: thalController,
+        endDrawer: const AppDrawer(),
+        body: const TabBarView(
+          children: [
+            SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: HomeForm(),
+              ),
+            ),
+            Center(
+                child:
+                    Text('Nutrition Info')), // Placeholder for the second tab
+          ],
         ),
       ),
     );
   }
 }
 
-class HomeForm extends StatelessWidget {
-  final TextEditingController ageController;
-  final TextEditingController sexController;
-  final TextEditingController cpController;
-  final TextEditingController trestbpsController;
-  final TextEditingController cholController;
-  final TextEditingController fbsController;
-  final TextEditingController restecgController;
-  final TextEditingController thalachController;
-  final TextEditingController exangController;
-  final TextEditingController oldpeakController;
-  final TextEditingController slopeController;
-  final TextEditingController caController;
-  final TextEditingController thalController;
-
-  const HomeForm({
-    super.key,
-    required this.ageController,
-    required this.sexController,
-    required this.cpController,
-    required this.trestbpsController,
-    required this.cholController,
-    required this.fbsController,
-    required this.restecgController,
-    required this.thalachController,
-    required this.exangController,
-    required this.oldpeakController,
-    required this.slopeController,
-    required this.caController,
-    required this.thalController,
-  });
+class AppDrawer extends StatelessWidget {
+  const AppDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        TextField(
-          controller: ageController,
-          decoration: const InputDecoration(labelText: 'Age'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: sexController,
-          decoration: const InputDecoration(labelText: 'Sex'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: cpController,
-          decoration: const InputDecoration(labelText: 'Chest Pain Type (cp)'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: trestbpsController,
-          decoration: const InputDecoration(
-              labelText: 'Resting Blood Pressure (trestbps)'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: cholController,
-          decoration:
-              const InputDecoration(labelText: 'Serum Cholesterol (chol)'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: fbsController,
-          decoration:
-              const InputDecoration(labelText: 'Fasting Blood Sugar (fbs)'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: restecgController,
-          decoration: const InputDecoration(
-              labelText: 'Resting Electrocardiographic Results (restecg)'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: thalachController,
-          decoration: const InputDecoration(
-              labelText: 'Maximum Heart Rate Achieved (thalach)'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: exangController,
-          decoration: const InputDecoration(
-              labelText: 'Exercise Induced Angina (exang)'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: oldpeakController,
-          decoration: const InputDecoration(
-              labelText:
-                  'ST Depression Induced by Exercise Relative to Rest (oldpeak)'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: slopeController,
-          decoration: const InputDecoration(
-              labelText: 'Slope of the Peak Exercise ST Segment (slope)'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: caController,
-          decoration: const InputDecoration(
-              labelText: 'Number of Major Vessels Colored by Flourosopy (ca)'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: thalController,
-          decoration: const InputDecoration(labelText: 'Thalassemia (thal)'),
-          keyboardType: TextInputType.number,
-        ),
-        ElevatedButton(
-          onPressed: () async {
-            await _submitData(context);
-          },
-          child: const Text('Submit'),
-        ),
-      ],
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+            child: Text(
+              'Menu',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.account_circle),
+            title: const Text('Profile'),
+            onTap: () {
+              // Navigate to profile page
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () {
+              // Navigate to settings page
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: const Text('History'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/history');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.info),
+            title: const Text('Logout'),
+            onTap: () {
+              AuthService().logout();
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
     );
+  }
+}
+
+class HomeForm extends StatefulWidget {
+  const HomeForm({Key? key}) : super(key: key);
+
+  @override
+  HomeFormState createState() => HomeFormState();
+}
+
+class HomeFormState extends State<HomeForm> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController totCholController = TextEditingController();
+  final TextEditingController sysBPController = TextEditingController();
+  final TextEditingController diaBPController = TextEditingController();
+  final TextEditingController BMIController = TextEditingController();
+  final TextEditingController heartRateController = TextEditingController();
+  final TextEditingController glucoseController = TextEditingController();
+  final TextEditingController cigsPerDayController =
+      TextEditingController(text: '0');
+
+  String? sex;
+  String? currentSmoker;
+  String? BPMeds;
+  String? prevalentStroke;
+  String? prevalentHyp;
+  String? diabetes;
+
+  @override
+  void dispose() {
+    ageController.dispose();
+    cigsPerDayController.dispose();
+    totCholController.dispose();
+    sysBPController.dispose();
+    diaBPController.dispose();
+    BMIController.dispose();
+    heartRateController.dispose();
+    glucoseController.dispose();
+    super.dispose();
   }
 
   Future<void> _submitData(BuildContext context) async {
     http.Response response = await ApiService.submitData(
       context,
+      nameController,
       ageController,
-      sexController,
-      cpController,
-      trestbpsController,
-      cholController,
-      fbsController,
-      restecgController,
-      thalachController,
-      exangController,
-      oldpeakController,
-      slopeController,
-      caController,
-      thalController,
+      TextEditingController(text: sex),
+      TextEditingController(text: currentSmoker),
+      cigsPerDayController,
+      TextEditingController(text: BPMeds),
+      TextEditingController(text: prevalentStroke),
+      TextEditingController(text: prevalentHyp),
+      TextEditingController(text: diabetes),
+      totCholController,
+      sysBPController,
+      diaBPController,
+      BMIController,
+      heartRateController,
+      glucoseController,
     );
 
     if (response.statusCode == 200) {
@@ -258,7 +190,12 @@ class HomeForm extends StatelessWidget {
       builder: (context) {
         return AlertDialog(
           title: const Text('Prediction'),
-          content: Text('Prediction: $prediction'),
+          content: Text(
+            prediction == 0 ? 'No heart disease' : 'Heart disease',
+            style: TextStyle(
+              color: prediction == 0 ? Colors.green : Colors.red,
+            ),
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -269,6 +206,157 @@ class HomeForm extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextField(controller: nameController),
+        Row(
+          children: [
+            Expanded(
+              child: _buildDropdownField(
+                label: 'Sex',
+                value: sex,
+                items: const [
+                  DropdownMenuItem(value: '0', child: Text('Female')),
+                  DropdownMenuItem(value: '1', child: Text('Male')),
+                ],
+                onChanged: (value) => setState(() => sex = value),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildDropdownField(
+                label: 'Current Smoker',
+                value: currentSmoker,
+                items: const [
+                  DropdownMenuItem(value: '0', child: Text('No')),
+                  DropdownMenuItem(value: '1', child: Text('Yes')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    currentSmoker = value;
+                    if (value == '0') {
+                      cigsPerDayController.text = '0';
+                    }
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _buildDropdownField(
+                label: 'Blood Pressure Medication (BPMeds)',
+                value: BPMeds,
+                items: const [
+                  DropdownMenuItem(value: '0', child: Text('No')),
+                  DropdownMenuItem(value: '1', child: Text('Yes')),
+                ],
+                onChanged: (value) => setState(() => BPMeds = value),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildDropdownField(
+                label: 'Prevalent Stroke',
+                value: prevalentStroke,
+                items: const [
+                  DropdownMenuItem(value: '0', child: Text('No')),
+                  DropdownMenuItem(value: '1', child: Text('Yes')),
+                ],
+                onChanged: (value) => setState(() => prevalentStroke = value),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _buildDropdownField(
+                label: 'Prevalent Hypertension',
+                value: prevalentHyp,
+                items: const [
+                  DropdownMenuItem(value: '0', child: Text('No')),
+                  DropdownMenuItem(value: '1', child: Text('Yes')),
+                ],
+                onChanged: (value) => setState(() => prevalentHyp = value),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildDropdownField(
+                label: 'Diabetes',
+                value: diabetes,
+                items: const [
+                  DropdownMenuItem(value: '0', child: Text('No')),
+                  DropdownMenuItem(value: '1', child: Text('Yes')),
+                ],
+                onChanged: (value) => setState(() => diabetes = value),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        _buildTextField(controller: ageController, label: 'Age'),
+        _buildTextField(
+            controller: cigsPerDayController,
+            label: 'Cigarettes Per Day',
+            isVisible: currentSmoker == '1'),
+        _buildTextField(
+            controller: totCholController,
+            label: 'Total Cholesterol (totChol)'),
+        _buildTextField(
+            controller: sysBPController,
+            label: 'Systolic Blood Pressure (sysBP)'),
+        _buildTextField(
+            controller: diaBPController,
+            label: 'Diastolic Blood Pressure (diaBP)'),
+        _buildTextField(
+            controller: BMIController, label: 'Body Mass Index (BMI)'),
+        _buildTextField(controller: heartRateController, label: 'Heart Rate'),
+        _buildTextField(controller: glucoseController, label: 'Glucose Level'),
+        ElevatedButton(
+          onPressed: () => _submitData(context),
+          child: const Text('Submit'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField(
+      {required TextEditingController controller,
+      required String label,
+      bool isVisible = true,
+      bool isNumber = true}) {
+    return Visibility(
+      visible: isVisible, // Set visibility based on flag
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(labelText: label),
+        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      ),
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String label,
+    required String? value,
+    required List<DropdownMenuItem<String>> items,
+    required void Function(String?) onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      decoration: InputDecoration(labelText: label),
+      value: value,
+      items: items,
+      onChanged: onChanged,
     );
   }
 }

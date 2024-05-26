@@ -1,8 +1,11 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/data/api_config.dart';
+import 'package:jwt_auth/data/features_config.dart';
 import 'package:jwt_auth/data/history_config.dart';
 import 'package:jwt_auth/data/location_config.dart';
 import 'package:jwt_auth/data/multi_survey_config.dart';
@@ -15,87 +18,41 @@ import 'package:jwt_auth/main.dart';
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 
-class Features {
-  final int age;
-  final int sex;
-  final int cp;
-  final int trestbps;
-  final int chol;
-  final int fbs;
-  final int restecg;
-  final int thalach;
-  final int exang;
-  final double oldpeak;
-  final int slope;
-  final int ca;
-  final int thal;
-
-  Features({
-    required this.age,
-    required this.sex,
-    required this.cp,
-    required this.trestbps,
-    required this.chol,
-    required this.fbs,
-    required this.restecg,
-    required this.thalach,
-    required this.exang,
-    required this.oldpeak,
-    required this.slope,
-    required this.ca,
-    required this.thal,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'age': age,
-      'sex': sex,
-      'cp': cp,
-      'trestbps': trestbps,
-      'chol': chol,
-      'fbs': fbs,
-      'restecg': restecg,
-      'thalach': thalach,
-      'exang': exang,
-      'oldpeak': oldpeak,
-      'slope': slope,
-      'ca': ca,
-      'thal': thal,
-    };
-  }
-}
-
 class ApiService {
   static Future<http.Response> submitData(
     BuildContext context,
-    TextEditingController ageController,
     TextEditingController sexController,
-    TextEditingController cpController,
-    TextEditingController trestbpsController,
-    TextEditingController cholController,
-    TextEditingController fbsController,
-    TextEditingController restecgController,
-    TextEditingController thalachController,
-    TextEditingController exangController,
-    TextEditingController oldpeakController,
-    TextEditingController slopeController,
-    TextEditingController caController,
-    TextEditingController thalController,
+    TextEditingController nameController,
+    TextEditingController ageController,
+    TextEditingController currentSmokerController,
+    TextEditingController cigsPerDayController,
+    TextEditingController BPMedsController,
+    TextEditingController prevalentStrokeController,
+    TextEditingController prevalentHypController,
+    TextEditingController diabetesController,
+    TextEditingController totCholController,
+    TextEditingController sysBPController,
+    TextEditingController diaBPController,
+    TextEditingController BMIController,
+    TextEditingController heartRateController,
+    TextEditingController glucoseController,
   ) async {
     final Features data = Features(
-      age: int.parse(ageController.text),
+      name: nameController.text,
       sex: int.parse(sexController.text),
-      cp: int.parse(cpController.text),
-      trestbps: int.parse(trestbpsController.text),
-      chol: int.parse(cholController.text),
-      fbs: int.parse(fbsController.text),
-      restecg: int.parse(restecgController.text),
-      thalach: int.parse(thalachController.text),
-      exang: int.parse(exangController.text),
-      oldpeak: double.parse(oldpeakController.text),
-      slope: int.parse(slopeController.text),
-      ca: int.parse(caController.text),
-      thal: int.parse(thalController.text),
+      age: int.parse(ageController.text),
+      currentSmoker: int.parse(currentSmokerController.text),
+      cigsPerDay: int.parse(cigsPerDayController.text),
+      BPMeds: int.parse(BPMedsController.text),
+      prevalentStroke: int.parse(prevalentStrokeController.text),
+      prevalentHyp: int.parse(prevalentHypController.text),
+      diabetes: int.parse(diabetesController.text),
+      totChol: int.parse(totCholController.text),
+      sysBP: int.parse(sysBPController.text),
+      diaBP: int.parse(diaBPController.text),
+      BMI: double.parse(BMIController.text),
+      heartRate: int.parse(heartRateController.text),
+      glucose: int.parse(glucoseController.text),
     );
     final accessToken = await AuthService().getAccessToken();
     final Uri url = Uri.parse('http://192.168.1.102:8000/api/predict/');
