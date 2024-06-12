@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 class History {
+  final int id;
   final String patientName;
   final int sex; // Male
   final int age; // Age in years
@@ -20,7 +21,8 @@ class History {
   final int prediction_result;
 
   History(
-      {required this.patientName,
+      {required this.id,
+      required this.patientName,
       required this.sex,
       required this.age,
       required this.currentSmoker,
@@ -40,6 +42,7 @@ class History {
 
   factory History.fromJson(Map<String, dynamic> json) {
     return History(
+        id: json['id'],
         patientName: json['patientName'] ?? 'Unknown',
         sex: json['sex'],
         age: json['age'],

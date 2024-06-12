@@ -213,6 +213,7 @@ class _HistoryScreenState extends State<HistoryPage> {
                               return GestureDetector(
                                 child: HistoryCard(
                                   ticket: historyList[index],
+                                  onUpdate: _fetchReports,
                                 ),
                               );
                             },

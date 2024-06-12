@@ -3,13 +3,16 @@ import 'package:permission_handler/permission_handler.dart';
 class PermissionManager {
   // Check and request necessary permissions
   Future<bool> checkAndRequestPermissions() async {
-    bool isStorageGranted = await _checkAndRequestPermission(Permission.storage);
-    bool isAccessMediaLocationGranted = await _checkAndRequestPermission(Permission.accessMediaLocation);
-    bool isManageExternalStorageGranted = await _checkAndRequestPermission(Permission.manageExternalStorage);
-    bool isLocationGranted = await _checkAndRequestPermission(Permission.location);
+    bool isStorageGranted =
+        await _checkAndRequestPermission(Permission.storage);
+    // bool isAccessMediaLocationGranted = await _checkAndRequestPermission(Permission.accessMediaLocation);
+    bool isManageExternalStorageGranted =
+        await _checkAndRequestPermission(Permission.manageExternalStorage);
+    // bool isLocationGranted = await _checkAndRequestPermission(Permission.location);
 
     // Return true only if all required permissions are granted
-    return isStorageGranted && isAccessMediaLocationGranted && isManageExternalStorageGranted && isLocationGranted;
+    return isStorageGranted &&
+        isManageExternalStorageGranted; //&& isLocationGranted && isAccessMediaLocationGranted;
   }
 
   // Check and request a single permission
@@ -34,8 +37,8 @@ class PermissionManager {
   // Request all missing permissions
   Future<void> requestMissingPermissions() async {
     await _checkAndRequestPermission(Permission.storage);
-    await _checkAndRequestPermission(Permission.accessMediaLocation);
+    //await _checkAndRequestPermission(Permission.accessMediaLocation);
     await _checkAndRequestPermission(Permission.manageExternalStorage);
-    await _checkAndRequestPermission(Permission.location);
+    //await _checkAndRequestPermission(Permission.location);
   }
 }

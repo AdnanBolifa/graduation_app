@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jwt_auth/screens/history.dart';
 import 'package:jwt_auth/screens/login.dart';
+import 'package:jwt_auth/screens/signup.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 import 'package:jwt_auth/screens/home.dart';
 import 'package:jwt_auth/theme/colors.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const HomeScreen(),
         '/history': (context) => const HistoryPage(),
         '/login': (context) => const LoginPage(),
+        '/signup': (context) => const SignUpPage(),
       },
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,

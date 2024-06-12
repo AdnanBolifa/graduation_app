@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_auth/data/history_config.dart';
+import 'package:jwt_auth/services/api_service.dart';
 
 class HistoryCard extends StatefulWidget {
   final History ticket;
+  final VoidCallback onUpdate;
 
-  const HistoryCard({Key? key, required this.ticket}) : super(key: key);
+  const HistoryCard({Key? key, required this.ticket, required this.onUpdate})
+      : super(key: key);
 
   @override
   State<HistoryCard> createState() => _TicketCardState();
@@ -99,7 +102,9 @@ class _TicketCardState extends State<HistoryCard> {
                             ),
                             child: IconButton(
                               onPressed: () {
-                                // Handle dismiss action
+                                ApiService().sendPredictionResult(
+                                    widget.ticket.id, false);
+                                widget.onUpdate();
                               },
                               icon: const Icon(
                                 Icons.close,
@@ -118,7 +123,9 @@ class _TicketCardState extends State<HistoryCard> {
                             ),
                             child: IconButton(
                               onPressed: () {
-                                // Handle accept action
+                                ApiService().sendPredictionResult(
+                                    widget.ticket.id, true);
+                                widget.onUpdate();
                               },
                               icon: const Icon(
                                 Icons.check,

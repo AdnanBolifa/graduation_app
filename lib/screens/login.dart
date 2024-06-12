@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:jwt_auth/screens/home.dart';
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 import 'package:jwt_auth/theme/colors.dart';
@@ -29,10 +28,14 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(height: 150),
-              //Image.asset('lib/assets/hti_logo.png'),
+              const SizedBox(height: 60),
+              Image.asset(
+                'lib/assets/icon.png',
+                width: 360,
+                height: 280,
+              ),
               const SizedBox(
-                height: 50,
+                height: 20,
               ),
               const Text(
                 'تسجيل الدخول',
@@ -45,6 +48,12 @@ class _LoginPageState extends State<LoginPage> {
                   isRight: false),
               textField('كلمة المرور', 'sudo su', passwordController,
                   isHide: true, isRight: false),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/signup');
+                },
+                child: const Text('Sign Up'),
+              ),
               ElevatedButton(
                 onPressed: isLoading
                     ? null
@@ -68,14 +77,9 @@ class _LoginPageState extends State<LoginPage> {
                         try {
                           final token = await AuthService().login(
                               emailController.text, passwordController.text);
-
                           await AuthService().storeTokens(token);
                           if (context.mounted) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => HomeScreen(),
-                              ),
-                            );
+                            Navigator.pushNamed(context, '/');
                           }
                         } catch (e) {
                           ApiService()
@@ -96,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                     ? const CircularProgressIndicator()
                     : const Text(
                         'دخول',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
               ),
             ],

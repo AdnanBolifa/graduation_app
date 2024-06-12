@@ -1,6 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/api_service.dart';
@@ -31,6 +33,9 @@ class HomeScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           bottom: const TabBar(
+            labelColor: Colors.green,
+            indicatorColor: Colors.amber,
+            dividerColor: Colors.red,
             tabs: [
               Tab(icon: Icon(Icons.bloodtype)),
               Tab(icon: Icon(Icons.fastfood)),
@@ -159,9 +164,9 @@ class HomeFormState extends State<HomeForm> {
   Future<void> _submitData(BuildContext context) async {
     http.Response response = await ApiService.submitData(
       context,
+      TextEditingController(text: sex),
       nameController,
       ageController,
-      TextEditingController(text: sex),
       TextEditingController(text: currentSmoker),
       cigsPerDayController,
       TextEditingController(text: BPMeds),
@@ -175,7 +180,6 @@ class HomeFormState extends State<HomeForm> {
       heartRateController,
       glucoseController,
     );
-
     if (response.statusCode == 200) {
       int prediction = ApiService.getPrediction(response);
       _showPredictionDialog(context, prediction);
@@ -191,7 +195,9 @@ class HomeFormState extends State<HomeForm> {
         return AlertDialog(
           title: const Text('Prediction'),
           content: Text(
-            prediction == 0 ? 'No heart disease' : 'Heart disease',
+            prediction == 0
+                ? "You don't heart disease"
+                : "You have Heart disease",
             style: TextStyle(
               color: prediction == 0 ? Colors.green : Colors.red,
             ),
@@ -213,7 +219,11 @@ class HomeFormState extends State<HomeForm> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TextField(controller: nameController),
+        _buildTextField(
+            controller: nameController,
+            label: 'Name',
+            hint: "John Doe",
+            isNumber: false),
         Row(
           children: [
             Expanded(
@@ -227,7 +237,6 @@ class HomeFormState extends State<HomeForm> {
                 onChanged: (value) => setState(() => sex = value),
               ),
             ),
-            const SizedBox(width: 10),
             Expanded(
               child: _buildDropdownField(
                 label: 'Current Smoker',
@@ -248,7 +257,7 @@ class HomeFormState extends State<HomeForm> {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        
         Row(
           children: [
             Expanded(
@@ -262,7 +271,7 @@ class HomeFormState extends State<HomeForm> {
                 onChanged: (value) => setState(() => BPMeds = value),
               ),
             ),
-            const SizedBox(width: 10),
+            
             Expanded(
               child: _buildDropdownField(
                 label: 'Prevalent Stroke',
@@ -276,7 +285,7 @@ class HomeFormState extends State<HomeForm> {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        
         Row(
           children: [
             Expanded(
@@ -290,7 +299,7 @@ class HomeFormState extends State<HomeForm> {
                 onChanged: (value) => setState(() => prevalentHyp = value),
               ),
             ),
-            const SizedBox(width: 10),
+            
             Expanded(
               child: _buildDropdownField(
                 label: 'Diabetes',
@@ -304,8 +313,32 @@ class HomeFormState extends State<HomeForm> {
             ),
           ],
         ),
-        const SizedBox(height: 10),
-        _buildTextField(controller: ageController, label: 'Age'),
+        
+        Row(
+          children: [
+            Expanded(
+              child: _buildTextField(controller: ageController, label: 'Age'),
+            ),
+            
+            Expanded(
+              child: _buildTextField(
+                  controller: heartRateController, label: 'Heart Rate'),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: _buildTextField(
+                  controller: BMIController, label: 'Body Mass Index (BMI)'),
+            ),
+            
+            Expanded(
+              child: _buildTextField(
+                  controller: glucoseController, label: 'Glucose Level'),
+            ),
+          ],
+        ),
         _buildTextField(
             controller: cigsPerDayController,
             label: 'Cigarettes Per Day',
@@ -319,10 +352,6 @@ class HomeFormState extends State<HomeForm> {
         _buildTextField(
             controller: diaBPController,
             label: 'Diastolic Blood Pressure (diaBP)'),
-        _buildTextField(
-            controller: BMIController, label: 'Body Mass Index (BMI)'),
-        _buildTextField(controller: heartRateController, label: 'Heart Rate'),
-        _buildTextField(controller: glucoseController, label: 'Glucose Level'),
         ElevatedButton(
           onPressed: () => _submitData(context),
           child: const Text('Submit'),
@@ -331,17 +360,39 @@ class HomeFormState extends State<HomeForm> {
     );
   }
 
-  Widget _buildTextField(
-      {required TextEditingController controller,
-      required String label,
-      bool isVisible = true,
-      bool isNumber = true}) {
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    bool isVisible = true,
+    bool isNumber = true,
+    String? hint,
+  }) {
     return Visibility(
-      visible: isVisible, // Set visibility based on flag
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(labelText: label),
-        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      visible: isVisible,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Align(
+              alignment: Alignment.center,
+              child: TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  labelText: label,
+                  hintText: hint ?? "",
+                  border: InputBorder.none,
+                ),
+                keyboardType:
+                    isNumber ? TextInputType.number : TextInputType.text,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -352,11 +403,24 @@ class HomeFormState extends State<HomeForm> {
     required List<DropdownMenuItem<String>> items,
     required void Function(String?) onChanged,
   }) {
-    return DropdownButtonFormField<String>(
-      decoration: InputDecoration(labelText: label),
-      value: value,
-      items: items,
-      onChanged: onChanged,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: label,
+            border: InputBorder.none,
+          ),
+          value: value,
+          items: items,
+          onChanged: onChanged,
+        ),
+      ),
     );
   }
 }

@@ -18,7 +18,7 @@
     
     </queries>
     <application
-        android:label="Tickets"
+        android:label="GP"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
