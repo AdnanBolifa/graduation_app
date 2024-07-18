@@ -1,6 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 
-class Features {
+class Heart {
   final String name;
   final int sex; // Male
   final int age; // Age in years
@@ -17,7 +17,7 @@ class Features {
   final int heartRate; // Heart rate in beats per minute
   final int glucose; // Glucose level in mg/dL
 
-  Features({
+  Heart({
     required this.name,
     required this.sex,
     required this.age,

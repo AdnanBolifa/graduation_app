@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Heart Disease Predictor#',
-      initialRoute: accessToken != null ? '/' : '/login',
+      initialRoute: accessToken != null ? '/' : '/',
       routes: {
         '/': (context) => const HomeScreen(),
         '/history': (context) => const HistoryPage(),

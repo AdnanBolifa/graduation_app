@@ -1,5 +1,4 @@
 // ignore_for_file: non_constant_identifier_names
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -11,7 +10,7 @@ import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 
 class ApiService {
-  static Future<http.Response> submitData(
+  static Future<http.Response> submitHeartData(
     BuildContext context,
     TextEditingController sexController,
     TextEditingController patientNameController,
@@ -29,7 +28,7 @@ class ApiService {
     TextEditingController heartRateController,
     TextEditingController glucoseController,
   ) async {
-    final Features data = Features(
+    final Heart data = Heart(
       name: patientNameController.text,
       sex: int.parse(sexController.text),
       age: int.parse(ageController.text),
@@ -48,14 +47,18 @@ class ApiService {
     );
     final accessToken = await AuthService().getAccessToken();
     final Uri url = Uri.parse(APIConfig.predictUrl);
+
+    final Map<String, dynamic> requestBody = data.toJson();
+    requestBody['prediction_type'] = 'heart';
     final response = await http.post(
       url,
       headers: <String, String>{
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(data.toJson()),
+      body: jsonEncode(requestBody),
     );
+
     return response;
   }
 
@@ -68,6 +71,7 @@ class ApiService {
     final response = await _performGetRequest(APIConfig.historyUrl);
     if (response.statusCode == 200) {
       try {
+        print('request body: ${response.body}');
         final List<dynamic> historyJson = jsonDecode(response.body);
         final List<History> history =
             historyJson.map((history) => History.fromJson(history)).toList();

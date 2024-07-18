@@ -48,61 +48,90 @@ class _LoginPageState extends State<LoginPage> {
                   isRight: false),
               textField('كلمة المرور', 'sudo su', passwordController,
                   isHide: true, isRight: false),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/signup');
-                },
-                child: const Text('Sign Up'),
-              ),
-              ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () async {
-                        var connectivityResult =
-                            await (Connectivity().checkConnectivity());
-                        if (connectivityResult == ConnectivityResult.none) {
-                          // No internet connection
-                          Fluttertoast.showToast(
-                            msg: "لا يوجد اتصال بالانترنت",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                          );
-                          return;
-                        }
-                        setState(() {
-                          isLoading = true;
-                        });
-                        try {
-                          final token = await AuthService().login(
-                              emailController.text, passwordController.text);
-                          await AuthService().storeTokens(token);
-                          if (context.mounted) {
-                            Navigator.pushNamed(context, '/');
-                          }
-                        } catch (e) {
-                          ApiService()
-                              .handleErrorMessage(msg: "LOGIN ERROR: $e");
-                        } finally {
-                          setState(() {
-                            isLoading = false;
-                          });
-                        }
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    width: 150, // Adjust the width as needed
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/signup');
                       },
-                style: ButtonStyle(
-                  minimumSize:
-                      MaterialStateProperty.all<Size>(const Size(150, 50)),
-                  backgroundColor:
-                      MaterialStateProperty.all<Color>(AppColors.primaryColor),
-                ),
-                child: isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text(
-                        'دخول',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
                       ),
-              ),
+                      child: const Text(
+                        'sign up',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 150, // Adjust the width as needed
+                    child: ElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () async {
+                              var connectivityResult =
+                                  await (Connectivity().checkConnectivity());
+                              if (connectivityResult ==
+                                  ConnectivityResult.none) {
+                                // No internet connection
+                                Fluttertoast.showToast(
+                                  msg: "لا يوجد اتصال بالانترنت",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white,
+                                );
+                                return;
+                              }
+                              setState(() {
+                                isLoading = true;
+                              });
+                              try {
+                                final token = await AuthService().login(
+                                    emailController.text,
+                                    passwordController.text);
+                                await AuthService().storeTokens(token);
+                                if (context.mounted) {
+                                  Navigator.pushNamed(context, '/');
+                                }
+                              } catch (e) {
+                                ApiService()
+                                    .handleErrorMessage(msg: "LOGIN ERROR: $e");
+                              } finally {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                      ),
+                      child: isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text(
+                              'Login',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),

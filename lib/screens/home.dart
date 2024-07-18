@@ -1,12 +1,11 @@
 // ignore_for_file: non_constant_identifier_names
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/services/auth_service.dart';
+import 'package:jwt_auth/theme/colors.dart';
 
 void main() {
   runApp(const HeartDiseasePredictorApp());
@@ -162,7 +161,7 @@ class HomeFormState extends State<HomeForm> {
   }
 
   Future<void> _submitData(BuildContext context) async {
-    http.Response response = await ApiService.submitData(
+    http.Response response = await ApiService.submitHeartData(
       context,
       TextEditingController(text: sex),
       nameController,
@@ -257,7 +256,6 @@ class HomeFormState extends State<HomeForm> {
             ),
           ],
         ),
-        
         Row(
           children: [
             Expanded(
@@ -271,7 +269,6 @@ class HomeFormState extends State<HomeForm> {
                 onChanged: (value) => setState(() => BPMeds = value),
               ),
             ),
-            
             Expanded(
               child: _buildDropdownField(
                 label: 'Prevalent Stroke',
@@ -285,7 +282,6 @@ class HomeFormState extends State<HomeForm> {
             ),
           ],
         ),
-        
         Row(
           children: [
             Expanded(
@@ -299,7 +295,6 @@ class HomeFormState extends State<HomeForm> {
                 onChanged: (value) => setState(() => prevalentHyp = value),
               ),
             ),
-            
             Expanded(
               child: _buildDropdownField(
                 label: 'Diabetes',
@@ -313,13 +308,11 @@ class HomeFormState extends State<HomeForm> {
             ),
           ],
         ),
-        
         Row(
           children: [
             Expanded(
               child: _buildTextField(controller: ageController, label: 'Age'),
             ),
-            
             Expanded(
               child: _buildTextField(
                   controller: heartRateController, label: 'Heart Rate'),
@@ -332,7 +325,6 @@ class HomeFormState extends State<HomeForm> {
               child: _buildTextField(
                   controller: BMIController, label: 'Body Mass Index (BMI)'),
             ),
-            
             Expanded(
               child: _buildTextField(
                   controller: glucoseController, label: 'Glucose Level'),
@@ -354,8 +346,15 @@ class HomeFormState extends State<HomeForm> {
             label: 'Diastolic Blood Pressure (diaBP)'),
         ElevatedButton(
           onPressed: () => _submitData(context),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryColor,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12), // <-- Radius
+            ),
+          ),
           child: const Text('Submit'),
-        ),
+        )
       ],
     );
   }
