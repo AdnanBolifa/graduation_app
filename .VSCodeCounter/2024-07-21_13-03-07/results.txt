@@ -1,0 +1,48 @@
+Date : 2024-07-21 13:03:07
+Directory : d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib
+Total : 18 files,  1681 codes, 54 comments, 134 blanks, all 1869 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Dart     |         18 |      1,681 |         54 |        134 |      1,869 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                             | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                |         18 |      1,681 |         54 |        134 |      1,869 |
+| . (Files)                                                                                        |          1 |         45 |          0 |          8 |         53 |
+| data                                                                                             |          3 |        125 |          4 |         14 |        143 |
+| screens                                                                                          |          4 |        872 |         24 |         45 |        941 |
+| services                                                                                         |          4 |        378 |         25 |         47 |        450 |
+| theme                                                                                            |          3 |         18 |          1 |          5 |         24 |
+| widgets                                                                                          |          3 |        243 |          0 |         15 |        258 |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                         | language | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\data\api_config.dart            | Dart     |         10 |          2 |          6 |         18 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\data\features_config.dart       | Dart     |         53 |          1 |          4 |         58 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\data\history_config.dart        | Dart     |         62 |          1 |          4 |         67 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\main.dart                       | Dart     |         45 |          0 |          8 |         53 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\history.dart            | Dart     |        194 |         19 |         15 |        228 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\home.dart               | Dart     |        404 |          3 |         19 |        426 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\login.dart              | Dart     |        136 |          1 |          5 |        142 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\signup.dart             | Dart     |        138 |          1 |          6 |        145 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\services\api_service.dart       | Dart     |        273 |         12 |         25 |        310 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\services\auth_service.dart      | Dart     |         66 |          1 |         11 |         78 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\services\check_permissions.dart | Dart     |         25 |         12 |          8 |         45 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\services\debouncer.dart         | Dart     |         14 |          0 |          3 |         17 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\theme\colors.dart               | Dart     |          7 |          0 |          2 |          9 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\theme\routes.dart               | Dart     |          4 |          1 |          1 |          6 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\theme\theme.dart                | Dart     |          7 |          0 |          2 |          9 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\widgets\error_dialog.dart       | Dart     |         29 |          0 |          4 |         33 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\widgets\history_card.dart       | Dart     |        152 |          0 |          8 |        160 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\widgets\text_field.dart         | Dart     |         62 |          0 |          3 |         65 |
+| Total                                                                                            |          |      1,681 |         54 |        134 |      1,869 |
++--------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

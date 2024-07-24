@@ -18,7 +18,7 @@ class History {
   final int heartRate; // Heart rate in beats per minute
   final int glucose; // Glucose level in mg/dL
   final bool? status;
-  final int prediction_result;
+  final double prediction_result;
 
   History({
     required this.id,
@@ -60,7 +60,7 @@ class History {
       heartRate: json['heartRate'] ?? 0,
       glucose: json['glucose'] ?? 0,
       status: json['doctor_feedback'],
-      prediction_result: json['TenYearCHD'] ?? 0,
+      prediction_result: json['Prediction'] ?? 0,
     );
   }
 }

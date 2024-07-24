@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jwt_auth/screens/bottom_nav_bar.dart';
 import 'package:jwt_auth/screens/history.dart';
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/screens/signup.dart';
 import 'package:jwt_auth/services/auth_service.dart';
-import 'package:jwt_auth/screens/home.dart';
+import 'package:jwt_auth/screens/heart.dart';
 import 'package:jwt_auth/theme/colors.dart';
 import 'package:jwt_auth/theme/theme.dart';
 
@@ -36,10 +37,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Heart Disease Predictor#',
-      initialRoute: accessToken != null ? '/' : '/',
+      title: 'Heart Disease Predictor',
+      initialRoute: accessToken != null ? '/' : '/login',
       routes: {
-        '/': (context) => const HomeScreen(),
+        '/': (context) => const BottomNav(),
         '/history': (context) => const HistoryPage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),

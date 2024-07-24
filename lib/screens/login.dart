@@ -54,27 +54,6 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     width: 150, // Adjust the width as needed
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/signup');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // <-- Radius
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
-                      ),
-                      child: const Text(
-                        'sign up',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 150, // Adjust the width as needed
-                    child: ElevatedButton(
                       onPressed: isLoading
                           ? null
                           : () async {
@@ -128,6 +107,27 @@ class _LoginPageState extends State<LoginPage> {
                               style:
                                   TextStyle(fontSize: 16, color: Colors.white),
                             ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 150, // Adjust the width as needed
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/signup');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                      ),
+                      child: const Text(
+                        'sign up',
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
                   ),
                 ],

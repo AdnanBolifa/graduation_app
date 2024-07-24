@@ -154,10 +154,6 @@ class _HistoryScreenState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("سجل الحالات"),
-        centerTitle: true,
-      ),
       body: noInternet || hasError || noTickets
           ? Center(
               child: Column(
@@ -165,7 +161,7 @@ class _HistoryScreenState extends State<HistoryPage> {
                 children: [
                   Text(
                     noTickets
-                        ? "😎 لا يوجد لديك اي بلاغ "
+                        ? "لا يوجد بيانات"
                         : noInternet
                             ? "لا يوجد اتصال بالإنترنت"
                             : "حدث خطأ يرجى تسجيل الخروج",

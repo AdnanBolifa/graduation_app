@@ -14,13 +14,13 @@ class HistoryCard extends StatefulWidget {
 }
 
 class _TicketCardState extends State<HistoryCard> {
-  String getPredictionText(int predictionResult) {
-    return predictionResult == 1
+  String getPredictionText(double predictionResult) {
+    return predictionResult >= 1
         ? 'Heart Disease Detected'
         : 'No Heart Disease Detected';
   }
 
-  Color getColorForPrediction(int predictionResult) {
+  Color getColorForPrediction(double predictionResult) {
     return predictionResult == 1 ? Colors.red : Colors.green;
   }
 
