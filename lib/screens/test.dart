@@ -1,7 +1,5 @@
-// ignore_for_file: use_build_context_synchronously
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/theme/colors.dart';
@@ -27,7 +25,6 @@ class DiabetesScreenState extends State<DiabetesScreen> {
   final TextEditingController bmiController = TextEditingController();
   final TextEditingController diabetesPedigreeFunctionController =
       TextEditingController();
-
   String? sex;
 
   @override
@@ -49,40 +46,21 @@ class DiabetesScreenState extends State<DiabetesScreen> {
 
     pdf.addPage(
       pw.Page(
-        build: (pw.Context context) => pw.Padding(
-          padding: const pw.EdgeInsets.all(16),
+        build: (pw.Context context) => pw.Center(
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
+              pw.Text('Name: ${nameController.text}'),
+              pw.Text('Age: ${ageController.text}'),
+              pw.Text('Sex: ${sex == '0' ? 'Female' : 'Male'}'),
+              pw.Text('Pregnancies: ${pregnanciesController.text}'),
+              pw.Text('Glucose: ${glucoseController.text}'),
+              pw.Text('Blood Pressure: ${bloodPressureController.text}'),
+              pw.Text('Skin Thickness: ${skinThicknessController.text}'),
+              pw.Text('Insulin: ${insulinController.text}'),
+              pw.Text('BMI: ${bmiController.text}'),
               pw.Text(
-                'Medical Test Report',
-                style: pw.TextStyle(
-                  fontSize: 36,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.SizedBox(height: 20),
-              _buildInfoRow('Name', nameController.text, 'Patient\'s name.'),
-              _buildInfoRow(
-                  'Age', ageController.text, 'Patient\'s age in years.'),
-              _buildInfoRow('Pregnancies', pregnanciesController.text,
-                  'Number of times the patient has been pregnant.'),
-              _buildInfoRow('Glucose', glucoseController.text,
-                  'Plasma glucose concentration after 2 hours in an oral glucose tolerance test.'),
-              _buildInfoRow('Blood Pressure', bloodPressureController.text,
-                  'Diastolic blood pressure (mm Hg).'),
-              _buildInfoRow('Skin Thickness', skinThicknessController.text,
-                  'Triceps skin fold thickness (mm).'),
-              _buildInfoRow('Insulin', insulinController.text,
-                  '2-Hour serum insulin (mu U/ml).'),
-              _buildInfoRow('BMI', bmiController.text,
-                  'Body Mass Index, a measure of body fat based on weight and height.'),
-              _buildInfoRow(
-                  'Diabetes Pedigree Function',
-                  diabetesPedigreeFunctionController.text,
-                  'Likelihood of diabetes based on family history.'),
-              _buildInfoRow(
-                  'Sex', sex ?? 'Not provided', 'Gender of the patient.'),
+                  'Diabetes Pedigree Function: ${diabetesPedigreeFunctionController.text}'),
             ],
           ),
         ),
@@ -91,38 +69,6 @@ class DiabetesScreenState extends State<DiabetesScreen> {
 
     final Uint8List pdfBytes = await pdf.save();
     Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdfBytes);
-  }
-
-  pw.Widget _buildInfoRow(String label, String value, String meaning) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          children: [
-            pw.Text(
-              '$label:',
-              style: pw.TextStyle(
-                fontSize: 18,
-                fontWeight: pw.FontWeight.bold,
-              ),
-            ),
-            pw.Text(
-              value,
-              style: const pw.TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
-        pw.SizedBox(height: 4),
-        pw.Text(
-          meaning,
-          style: const pw.TextStyle(
-            fontSize: 14,
-          ),
-        ),
-        pw.SizedBox(height: 12),
-      ],
-    );
   }
 
   @override
@@ -160,72 +106,7 @@ class DiabetesScreenState extends State<DiabetesScreen> {
                 ),
               ],
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    controller: pregnanciesController,
-                    label: 'Pregnancies',
-                    hint: 'Number of times the patient has been pregnant',
-                  ),
-                ),
-                Expanded(
-                  child: _buildTextField(
-                    controller: glucoseController,
-                    label: 'Glucose',
-                    hint:
-                        'Plasma glucose concentration after 2 hours in an oral glucose tolerance test',
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    controller: bloodPressureController,
-                    label: 'Blood Pressure',
-                    hint: 'Diastolic blood pressure (mm Hg)',
-                  ),
-                ),
-                Expanded(
-                  child: _buildTextField(
-                    controller: skinThicknessController,
-                    label: 'Skin Thickness',
-                    hint: 'Triceps skin fold thickness (mm)',
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    controller: insulinController,
-                    label: 'Insulin',
-                    hint: '2-Hour serum insulin (mu U/ml)',
-                  ),
-                ),
-                Expanded(
-                  child: _buildTextField(
-                    controller: bmiController,
-                    label: 'BMI',
-                    hint: 'Body Mass Index (weight in kg/(height in m)^2)',
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    controller: diabetesPedigreeFunctionController,
-                    label: 'Diabetes Pedigree Function',
-                    hint: 'Likelihood of diabetes based on family history',
-                  ),
-                ),
-              ],
-            ),
+            // Other fields here...
             ElevatedButton(
               onPressed: () => _submitData(context),
               style: ElevatedButton.styleFrom(
@@ -239,14 +120,7 @@ class DiabetesScreenState extends State<DiabetesScreen> {
             ),
             ElevatedButton(
               onPressed: _generatePdf,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text('Generate PDF'),
+              child: const Text('Export to PDF'),
             ),
           ],
         ),

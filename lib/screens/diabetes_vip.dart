@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/theme/colors.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -41,6 +45,87 @@ class DiabetesVIPScreenState extends State<DiabetesVIPScreen> {
     vldlController.dispose();
     bmiController.dispose();
     super.dispose();
+  }
+
+  Future<void> _generatePdf() async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) => pw.Padding(
+          padding: const pw.EdgeInsets.all(16),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Medical Test Report',
+                style: pw.TextStyle(
+                  fontSize: 36,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 20),
+              _buildInfoRow('Name', nameController.text, 'Patient\'s name.'),
+              _buildInfoRow(
+                  'Age', ageController.text, 'Patient\'s age in years.'),
+              _buildInfoRow('Urea', ureaController.text,
+                  'Blood urea nitrogen level, indicating kidney function.'),
+              _buildInfoRow('Creatinine (CR)', crController.text,
+                  'Creatinine level in blood, indicating kidney function.'),
+              _buildInfoRow('HbA1c', hbA1cController.text,
+                  'Glycated hemoglobin, reflecting average blood glucose levels over 2-3 months.'),
+              _buildInfoRow('Cholesterol (Chol)', cholController.text,
+                  'Total cholesterol level in blood.'),
+              _buildInfoRow('Triglycerides (TG)', tgController.text,
+                  'Level of triglycerides in blood, a type of fat.'),
+              _buildInfoRow('HDL', hdlController.text,
+                  'High-density lipoprotein, known as "good" cholesterol.'),
+              _buildInfoRow('LDL', ldlController.text,
+                  'Low-density lipoprotein, known as "bad" cholesterol.'),
+              _buildInfoRow('VLDL', vldlController.text,
+                  'Very low-density lipoprotein, another type of "bad" cholesterol.'),
+              _buildInfoRow('BMI', bmiController.text,
+                  'Body Mass Index, a measure of body fat based on weight and height.'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final Uint8List pdfBytes = await pdf.save();
+    Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdfBytes);
+  }
+
+  pw.Widget _buildInfoRow(String label, String value, String meaning) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text(
+              '$label:',
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            pw.Text(
+              value,
+              style: const pw.TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+        pw.SizedBox(height: 4),
+        pw.Text(
+          meaning,
+          style: const pw.TextStyle(
+            fontSize: 14,
+          ),
+        ),
+        pw.SizedBox(height: 12),
+      ],
+    );
   }
 
   @override
@@ -170,6 +255,17 @@ class DiabetesVIPScreenState extends State<DiabetesVIPScreen> {
                 ),
               ),
               child: const Text('Submit'),
+            ),
+            ElevatedButton(
+              onPressed: _generatePdf,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text('Generate PDF'),
             ),
           ],
         ),

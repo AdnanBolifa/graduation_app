@@ -1,9 +1,13 @@
 // ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:jwt_auth/theme/colors.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/services/api_service.dart';
+import 'package:jwt_auth/theme/colors.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class HypertensionScreen extends StatefulWidget {
   const HypertensionScreen({Key? key}) : super(key: key);
@@ -42,6 +46,101 @@ class HypertensionScreenState extends State<HypertensionScreen> {
     heartRateController.dispose();
     glucoseController.dispose();
     super.dispose();
+  }
+
+  Future<void> _generatePdf() async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) => pw.Padding(
+          padding: const pw.EdgeInsets.all(16),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Medical Test Report',
+                style: pw.TextStyle(
+                  fontSize: 36,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 20),
+              _buildInfoRow('Name', nameController.text, 'Patient\'s name.'),
+              _buildInfoRow(
+                  'Age', ageController.text, 'Patient\'s age in years.'),
+              _buildInfoRow('Total Cholesterol', totCholController.text,
+                  'Total cholesterol level in blood.'),
+              _buildInfoRow('Systolic Blood Pressure', sysBPController.text,
+                  'Systolic blood pressure (mm Hg).'),
+              _buildInfoRow('Diastolic Blood Pressure', diaBPController.text,
+                  'Diastolic blood pressure (mm Hg).'),
+              _buildInfoRow('BMI', BMIController.text,
+                  'Body Mass Index, a measure of body fat based on weight and height.'),
+              _buildInfoRow('Heart Rate', heartRateController.text,
+                  'Heart rate in beats per minute (bpm).'),
+              _buildInfoRow('Glucose', glucoseController.text,
+                  'Plasma glucose concentration.'),
+              _buildInfoRow('Cigarettes Per Day', cigsPerDayController.text,
+                  'Number of cigarettes smoked per day.'),
+              _buildInfoRow(
+                  'Sex', sex ?? 'Not provided', 'Gender of the patient.'),
+              _buildInfoRow('Current Smoker', currentSmoker ?? 'Not provided',
+                  'Indicates if the patient is a current smoker.'),
+              _buildInfoRow(
+                  'Blood Pressure Medications',
+                  BPMeds ?? 'Not provided',
+                  'Indicates if the patient is on blood pressure medications.'),
+              _buildInfoRow(
+                  'Prevalent Stroke',
+                  prevalentStroke ?? 'Not provided',
+                  'Indicates if the patient has a history of stroke.'),
+              _buildInfoRow(
+                  'Prevalent Hypertension',
+                  prevalentHyp ?? 'Not provided',
+                  'Indicates if the patient has a history of hypertension.'),
+              _buildInfoRow('Diabetes', diabetes ?? 'Not provided',
+                  'Indicates if the patient has diabetes.'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final Uint8List pdfBytes = await pdf.save();
+    Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdfBytes);
+  }
+
+  pw.Widget _buildInfoRow(String label, String value, String meaning) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text(
+              '$label:',
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            pw.Text(
+              value,
+              style: const pw.TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+        pw.SizedBox(height: 4),
+        pw.Text(
+          meaning,
+          style: const pw.TextStyle(
+            fontSize: 14,
+          ),
+        ),
+        pw.SizedBox(height: 12),
+      ],
+    );
   }
 
   @override
@@ -163,6 +262,17 @@ class HypertensionScreenState extends State<HypertensionScreen> {
                 ),
               ),
               child: const Text('Submit'),
+            ),
+            ElevatedButton(
+              onPressed: _generatePdf,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12), // <-- Radius
+                ),
+              ),
+              child: const Text('Generate PDF'),
             )
           ],
         ),
