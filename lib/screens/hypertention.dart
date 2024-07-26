@@ -356,8 +356,8 @@ class HypertensionScreenState extends State<HypertensionScreen> {
             children: [
               Text(
                 prediction == 0
-                    ? "You don't have heart disease."
-                    : "You have heart disease.",
+                    ? "You don't have Hypertension."
+                    : "You have Hypertension.",
                 style: TextStyle(
                   color: prediction == 0 ? Colors.green : Colors.red,
                   fontSize: 18,

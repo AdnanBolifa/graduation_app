@@ -326,8 +326,8 @@ class DiabetesScreenState extends State<DiabetesScreen> {
             children: [
               Text(
                 prediction == 0
-                    ? "You don't have heart disease."
-                    : "You have heart disease.",
+                    ? "You don't have Diabetes."
+                    : "You have Diabetes.",
                 style: TextStyle(
                   color: prediction == 0 ? Colors.green : Colors.red,
                   fontSize: 18,
@@ -335,7 +335,9 @@ class DiabetesScreenState extends State<DiabetesScreen> {
               ),
               const SizedBox(height: 10),
               Text(
-                "Probability: ${probabilityPositive.toStringAsFixed(2)}%",
+                prediction == 0
+                    ? "Probability: ${(100 - probabilityPositive).toStringAsFixed(2)}%"
+                    : "Probability: ${probabilityPositive.toStringAsFixed(2)}%",
                 style: const TextStyle(fontSize: 16),
               ),
             ],

@@ -1,6 +1,6 @@
 class APIConfig {
   //* Base URL for the API
-  static const String _baseUrl = 'http://192.168.1.102:8080/api/';
+  static const String _baseUrl = 'http://193.23.160.141:5050/api/';
 
   // URLs for specific API endpoints
   static String loginUrl = "${_baseUrl}login/";

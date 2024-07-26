@@ -354,7 +354,9 @@ class DiabetesVIPScreenState extends State<DiabetesVIPScreen> {
               ),
               const SizedBox(height: 10),
               Text(
-                "Probability: ${probabilityPositive.toStringAsFixed(2)}%",
+                prediction == 0
+                    ? "Probability: ${(100 - probabilityPositive).toStringAsFixed(2)}%"
+                    : "Probability: ${probabilityPositive.toStringAsFixed(2)}%",
                 style: const TextStyle(fontSize: 16),
               ),
             ],
