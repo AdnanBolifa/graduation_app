@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 
 class SettingsPage extends StatefulWidget {

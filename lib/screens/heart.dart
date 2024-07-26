@@ -1,9 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/api_service.dart';
-import 'package:jwt_auth/services/auth_service.dart';
 import 'package:jwt_auth/theme/colors.dart';
 
 class HeartScreen extends StatefulWidget {

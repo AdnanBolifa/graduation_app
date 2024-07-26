@@ -1,6 +1,6 @@
 class APIConfig {
   //* Base URL for the API
-  static const String _baseUrl = 'https://api.adnan.ly/api/';
+  static const String _baseUrl = 'http://0.0.0.0:8080/api/';
 
   // URLs for specific API endpoints
   static String loginUrl = "${_baseUrl}login/";

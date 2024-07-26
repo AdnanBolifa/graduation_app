@@ -62,6 +62,99 @@ class ApiService {
     return response;
   }
 
+  static Future<http.Response> submitDiabetesBasicData({
+    required BuildContext context,
+    required TextEditingController nameController,
+    required TextEditingController ageController,
+    required TextEditingController pregnanciesController,
+    required TextEditingController glucoseController,
+    required TextEditingController bloodPressureController,
+    required TextEditingController skinThicknessController,
+    required TextEditingController insulinController,
+    required TextEditingController bmiController,
+    required TextEditingController diabetesPedigreeFunctionController,
+    required TextEditingController sexController,
+  }) async {
+    final Diabetes data = Diabetes(
+      name: nameController.text,
+      pregnancies: int.parse(pregnanciesController.text),
+      glucose: int.parse(glucoseController.text),
+      bloodPressure: int.parse(bloodPressureController.text),
+      skinThickness: int.parse(skinThicknessController.text),
+      insulin: int.parse(insulinController.text),
+      bmi: double.parse(bmiController.text),
+      diabetesPedigreeFunction:
+          double.parse(diabetesPedigreeFunctionController.text),
+      sex: int.parse(sexController.text),
+      age: int.parse(ageController.text),
+    );
+    final accessToken = await AuthService().getAccessToken();
+    final Uri url = Uri.parse(APIConfig.predictUrl);
+
+    final Map<String, dynamic> requestBody = data.toJson();
+    requestBody['prediction_type'] = 'diabetes';
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    return response;
+  }
+
+  static Future<http.Response> submitHypertensionData({
+    required BuildContext context,
+    required TextEditingController nameController,
+    required TextEditingController ageController,
+    required TextEditingController sexController,
+    required TextEditingController currentSmokerController,
+    required TextEditingController cigsPerDayController,
+    required TextEditingController BPMedsController,
+    required TextEditingController diabetesController,
+    required TextEditingController totCholController,
+    required TextEditingController sysBPController,
+    required TextEditingController diaBPController,
+    required TextEditingController bmiController,
+    required TextEditingController heartRateController,
+    required TextEditingController glucoseController,
+  }) async {
+    final Hypertension data = Hypertension(
+      name: nameController.text,
+      age: int.parse(ageController.text),
+      sex: int.parse(sexController.text),
+      currentSmoker: int.parse(currentSmokerController.text),
+      cigsPerDay: int.parse(cigsPerDayController.text),
+      BPMeds: int.parse(BPMedsController.text),
+      diabetes: int.parse(diabetesController.text),
+      totChol: int.parse(totCholController.text),
+      sysBP: int.parse(sysBPController.text),
+      diaBP: int.parse(diaBPController.text),
+      bmi: double.parse(bmiController.text),
+      heartRate: int.parse(heartRateController.text),
+      glucose: int.parse(glucoseController.text),
+    );
+
+    final accessToken = await AuthService().getAccessToken();
+    final Uri url = Uri.parse(APIConfig.predictUrl);
+
+    final Map<String, dynamic> requestBody = data.toJson();
+    requestBody['prediction_type'] = 'hypertension';
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    return response;
+  }
+
   static int getPrediction(http.Response response) {
     Map<String, dynamic> responseBody = jsonDecode(response.body);
     return responseBody['prediction'];

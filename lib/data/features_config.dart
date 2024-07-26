@@ -55,3 +55,93 @@ class Heart {
     };
   }
 }
+
+class Diabetes {
+  final String name;
+  final int pregnancies;
+  final int glucose;
+  final int bloodPressure;
+  final int skinThickness;
+  final int insulin;
+  final double bmi;
+  final double diabetesPedigreeFunction;
+  final int age;
+  final int sex;
+
+  Diabetes({
+    required this.name,
+    required this.sex,
+    required this.pregnancies,
+    required this.glucose,
+    required this.bloodPressure,
+    required this.skinThickness,
+    required this.insulin,
+    required this.bmi,
+    required this.diabetesPedigreeFunction,
+    required this.age,
+  });
+  Map<String, dynamic> toJson() {
+    return {
+      'patientName': name,
+      'Pregnancies': pregnancies,
+      'Glucose': glucose,
+      'BloodPressure': bloodPressure,
+      'SkinThickness': skinThickness,
+      'Insulin': insulin,
+      'BMI': bmi,
+      'DiabetesPedigreeFunction': diabetesPedigreeFunction,
+      'age': age,
+      'sex': sex,
+    };
+  }
+}
+class Hypertension {
+  final String name;
+  final int sex;
+  final int age;
+  final int currentSmoker;
+  final int cigsPerDay;
+  final int BPMeds;
+  final int diabetes;
+  final int totChol;
+  final int sysBP;
+  final int diaBP;
+  final double bmi;
+  final int heartRate;
+  final int glucose;
+
+  Hypertension({
+    required this.name,
+    required this.sex,
+    required this.age,
+    required this.currentSmoker,
+    required this.cigsPerDay,
+    required this.BPMeds,
+    required this.diabetes,
+    required this.totChol,
+    required this.sysBP,
+    required this.diaBP,
+    required this.bmi,
+    required this.heartRate,
+    required this.glucose,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'patientName': name,
+      'sex': sex,
+      'age': age,
+      'currentSmoker': currentSmoker,
+      'cigsPerDay': cigsPerDay,
+      'BPMeds': BPMeds,
+      'diabetes': diabetes,
+      'totChol': totChol,
+      'sysBP': sysBP,
+      'diaBP': diaBP,
+      'BMI': bmi,
+      'heartRate': heartRate,
+      'glucose': glucose,
+    };
+  }
+}
+

@@ -1,4 +1,10 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
+import 'package:jwt_auth/theme/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/theme/colors.dart';
 
 class HypertensionScreen extends StatefulWidget {
@@ -9,36 +15,34 @@ class HypertensionScreen extends StatefulWidget {
 }
 
 class HypertensionScreenState extends State<HypertensionScreen> {
-  final TextEditingController currentSmokerController = TextEditingController();
-  final TextEditingController cigsPerDayController = TextEditingController();
-  final TextEditingController bpMedsController = TextEditingController();
-  final TextEditingController diabetesController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
   final TextEditingController totCholController = TextEditingController();
   final TextEditingController sysBPController = TextEditingController();
   final TextEditingController diaBPController = TextEditingController();
-  final TextEditingController bmiController = TextEditingController();
+  final TextEditingController BMIController = TextEditingController();
   final TextEditingController heartRateController = TextEditingController();
   final TextEditingController glucoseController = TextEditingController();
-
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController ageController = TextEditingController();
+  final TextEditingController cigsPerDayController =
+      TextEditingController(text: '0');
 
   String? sex;
+  String? currentSmoker;
+  String? BPMeds;
+  String? prevalentStroke;
+  String? prevalentHyp;
+  String? diabetes;
 
   @override
   void dispose() {
-    currentSmokerController.dispose();
+    ageController.dispose();
     cigsPerDayController.dispose();
-    bpMedsController.dispose();
-    diabetesController.dispose();
     totCholController.dispose();
     sysBPController.dispose();
     diaBPController.dispose();
-    bmiController.dispose();
+    BMIController.dispose();
     heartRateController.dispose();
     glucoseController.dispose();
-    nameController.dispose();
-    ageController.dispose();
     super.dispose();
   }
 
@@ -80,35 +84,51 @@ class HypertensionScreenState extends State<HypertensionScreen> {
             Row(
               children: [
                 Expanded(
-                  child: _buildTextField(
-                    controller: currentSmokerController,
+                  child: _buildDropdownField(
                     label: 'Current Smoker',
-                    hint: 'Yes/No',
+                    value: currentSmoker,
+                    items: const [
+                      DropdownMenuItem(value: '0', child: Text('No')),
+                      DropdownMenuItem(value: '1', child: Text('Yes')),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        currentSmoker = value;
+                        if (value == '0') {
+                          cigsPerDayController.text = '0';
+                        }
+                      });
+                    },
                   ),
                 ),
-                Expanded(
-                  child: _buildTextField(
+                _buildTextField(
                     controller: cigsPerDayController,
-                    label: 'Cigs Per Day',
-                    hint: 'Number of cigarettes smoked per day',
-                  ),
-                ),
+                    label: 'Cigarettes Per Day',
+                    isVisible: currentSmoker == '1'),
               ],
             ),
             Row(
               children: [
                 Expanded(
-                  child: _buildTextField(
-                    controller: bpMedsController,
-                    label: 'BP Meds',
-                    hint: 'Yes/No',
+                  child: _buildDropdownField(
+                    label: 'Blood Pressure Medication',
+                    value: BPMeds,
+                    items: const [
+                      DropdownMenuItem(value: '0', child: Text('No')),
+                      DropdownMenuItem(value: '1', child: Text('Yes')),
+                    ],
+                    onChanged: (value) => setState(() => BPMeds = value),
                   ),
                 ),
                 Expanded(
-                  child: _buildTextField(
-                    controller: diabetesController,
-                    label: 'Diabetes',
-                    hint: 'Yes/No',
+                  child: _buildDropdownField(
+                    label: 'BP Meds',
+                    value: diabetes,
+                    items: const [
+                      DropdownMenuItem(value: '0', child: Text('No')),
+                      DropdownMenuItem(value: '1', child: Text('Yes')),
+                    ],
+                    onChanged: (value) => setState(() => diabetes = value),
                   ),
                 ),
               ],
@@ -142,7 +162,7 @@ class HypertensionScreenState extends State<HypertensionScreen> {
                 ),
                 Expanded(
                   child: _buildTextField(
-                    controller: bmiController,
+                    controller: BMIController,
                     label: 'BMI',
                     hint: 'Body Mass Index',
                   ),
@@ -187,29 +207,33 @@ class HypertensionScreenState extends State<HypertensionScreen> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    String? hint,
+    bool isVisible = true,
     bool isNumber = true,
+    String? hint,
   }) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Align(
-            alignment: Alignment.center,
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                labelText: label,
-                hintText: hint ?? "",
-                border: InputBorder.none,
+    return Visibility(
+      visible: isVisible,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Align(
+              alignment: Alignment.center,
+              child: TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  labelText: label,
+                  hintText: hint ?? "",
+                  border: InputBorder.none,
+                ),
+                keyboardType:
+                    isNumber ? TextInputType.number : TextInputType.text,
               ),
-              keyboardType:
-                  isNumber ? TextInputType.number : TextInputType.text,
             ),
           ),
         ),
@@ -270,6 +294,27 @@ class HypertensionScreenState extends State<HypertensionScreen> {
   }
 
   Future<void> _submitData(BuildContext context) async {
-    // Add your data submission logic here
+    http.Response response = await ApiService.submitHypertensionData(
+      context: context,
+      nameController: nameController,
+      ageController: ageController,
+      cigsPerDayController: cigsPerDayController,
+      diaBPController: TextEditingController(text: diabetes),
+      totCholController: totCholController,
+      heartRateController: heartRateController,
+      glucoseController: glucoseController,
+      sysBPController: sysBPController,
+      BPMedsController: TextEditingController(text: BPMeds),
+      currentSmokerController: TextEditingController(text: currentSmoker),
+      sexController: TextEditingController(text: sex),
+      diabetesController: diaBPController,
+      bmiController: BMIController,
+    );
+    if (response.statusCode == 200) {
+      int prediction = ApiService.getPrediction(response);
+      _showPredictionDialog(context, prediction);
+    } else {
+      ApiService.handleError(response);
+    }
   }
 }

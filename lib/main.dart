@@ -5,7 +5,6 @@ import 'package:jwt_auth/screens/history.dart';
 import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/screens/signup.dart';
 import 'package:jwt_auth/services/auth_service.dart';
-import 'package:jwt_auth/screens/heart.dart';
 import 'package:jwt_auth/theme/colors.dart';
 import 'package:jwt_auth/theme/theme.dart';
 

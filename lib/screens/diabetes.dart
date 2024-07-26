@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/theme/colors.dart';
 
 class DiabetesScreen extends StatefulWidget {
@@ -240,24 +242,24 @@ class DiabetesScreenState extends State<DiabetesScreen> {
   }
 
   Future<void> _submitData(BuildContext context) async {
-    // http.Response response = await ApiService.submitDiabetesData(
-    //   context,
-    //   nameController,
-    //   TextEditingController(text: sex),
-    //   ageController,
-    //   pregnanciesController,
-    //   glucoseController,
-    //   bloodPressureController,
-    //   skinThicknessController,
-    //   insulinController,
-    //   bmiController,
-    //   diabetesPedigreeFunctionController,
-    // );
-    // if (response.statusCode == 200) {
-    //   int prediction = ApiService.getPrediction(response);
-    //   _showPredictionDialog(context, prediction);
-    // } else {
-    //   ApiService.handleError(response);
-    // }
+    http.Response response = await ApiService.submitDiabetesBasicData(
+      context: context,
+      nameController: nameController,
+      ageController: ageController,
+      pregnanciesController: pregnanciesController,
+      glucoseController: glucoseController,
+      bloodPressureController: bloodPressureController,
+      skinThicknessController: skinThicknessController,
+      insulinController: insulinController,
+      bmiController: bmiController,
+      diabetesPedigreeFunctionController: diabetesPedigreeFunctionController,
+      sexController: TextEditingController(text: sex),
+    );
+    if (response.statusCode == 200) {
+      int prediction = ApiService.getPrediction(response);
+      _showPredictionDialog(context, prediction);
+    } else {
+      ApiService.handleError(response);
+    }
   }
 }
