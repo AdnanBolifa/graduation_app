@@ -95,6 +95,54 @@ class Diabetes {
     };
   }
 }
+
+class DiabetesVip {
+  final String name;
+  final int sex;
+  final int age;
+  final double urea;
+  final double cr;
+  final double hbA1c;
+  final double chol;
+  final double tg;
+  final double hdl;
+  final double ldl;
+  final double vldl;
+  final double bmi;
+
+  DiabetesVip({
+    required this.name,
+    required this.sex,
+    required this.age,
+    required this.urea,
+    required this.cr,
+    required this.hbA1c,
+    required this.chol,
+    required this.tg,
+    required this.hdl,
+    required this.ldl,
+    required this.vldl,
+    required this.bmi,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'patientName': name,
+      'sex': sex,
+      'age': age,
+      'Urea': urea,
+      'Cr': cr,
+      'HbA1c': hbA1c,
+      'Chol': chol,
+      'TG': tg,
+      'HDL': hdl,
+      'LDL': ldl,
+      'VLDL': vldl,
+      'BMI': bmi,
+    };
+  }
+}
+
 class Hypertension {
   final String name;
   final int sex;
@@ -144,4 +192,3 @@ class Hypertension {
     };
   }
 }
-

@@ -1,6 +1,6 @@
 class APIConfig {
   //* Base URL for the API
-  static const String _baseUrl = 'http://0.0.0.0:8080/api/';
+  static const String _baseUrl = 'http://192.168.0.109:8080/api/';
 
   // URLs for specific API endpoints
   static String loginUrl = "${_baseUrl}login/";
@@ -12,6 +12,7 @@ class APIConfig {
   static String historyUrl = "${_baseUrl}patient_history/";
 
   static String feedbackUrl = "${_baseUrl}feedback/";
+  static String isDoctorUrl = "${_baseUrl}is-doctor/";
 
   static String version = '1.0.0';
 }

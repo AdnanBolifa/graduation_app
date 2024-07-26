@@ -1,28 +1,29 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/services/api_service.dart';
 import 'package:jwt_auth/theme/colors.dart';
 
-class DiabetesScreen extends StatefulWidget {
-  const DiabetesScreen({Key? key}) : super(key: key);
+// ignore_for_file: use_build_context_synchronously
+
+class DiabetesVIPScreen extends StatefulWidget {
+  const DiabetesVIPScreen({Key? key}) : super(key: key);
 
   @override
-  DiabetesScreenState createState() => DiabetesScreenState();
+  DiabetesVIPScreenState createState() => DiabetesVIPScreenState();
 }
 
-class DiabetesScreenState extends State<DiabetesScreen> {
+class DiabetesVIPScreenState extends State<DiabetesVIPScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
-  final TextEditingController pregnanciesController = TextEditingController();
-  final TextEditingController glucoseController = TextEditingController();
-  final TextEditingController bloodPressureController = TextEditingController();
-  final TextEditingController skinThicknessController = TextEditingController();
-  final TextEditingController insulinController = TextEditingController();
+  final TextEditingController ureaController = TextEditingController();
+  final TextEditingController crController = TextEditingController();
+  final TextEditingController hbA1cController = TextEditingController();
+  final TextEditingController cholController = TextEditingController();
+  final TextEditingController tgController = TextEditingController();
+  final TextEditingController hdlController = TextEditingController();
+  final TextEditingController ldlController = TextEditingController();
+  final TextEditingController vldlController = TextEditingController();
   final TextEditingController bmiController = TextEditingController();
-  final TextEditingController diabetesPedigreeFunctionController =
-      TextEditingController();
 
   String? sex;
 
@@ -30,13 +31,15 @@ class DiabetesScreenState extends State<DiabetesScreen> {
   void dispose() {
     nameController.dispose();
     ageController.dispose();
-    pregnanciesController.dispose();
-    glucoseController.dispose();
-    bloodPressureController.dispose();
-    skinThicknessController.dispose();
-    insulinController.dispose();
+    ureaController.dispose();
+    crController.dispose();
+    hbA1cController.dispose();
+    cholController.dispose();
+    tgController.dispose();
+    hdlController.dispose();
+    ldlController.dispose();
+    vldlController.dispose();
     bmiController.dispose();
-    diabetesPedigreeFunctionController.dispose();
     super.dispose();
   }
 
@@ -66,6 +69,7 @@ class DiabetesScreenState extends State<DiabetesScreen> {
                     onChanged: (value) => setState(() => sex = value),
                   ),
                 ),
+                const SizedBox(width: 8.0), // Space between fields
                 Expanded(
                   child: _buildTextField(
                     controller: ageController,
@@ -79,17 +83,17 @@ class DiabetesScreenState extends State<DiabetesScreen> {
               children: [
                 Expanded(
                   child: _buildTextField(
-                    controller: pregnanciesController,
-                    label: 'Pregnancies',
-                    hint: 'Number of times the patient has been pregnant',
+                    controller: ureaController,
+                    label: 'Urea',
+                    hint: 'Enter your Urea level',
                   ),
                 ),
+                const SizedBox(width: 8.0), // Space between fields
                 Expanded(
                   child: _buildTextField(
-                    controller: glucoseController,
-                    label: 'Glucose',
-                    hint:
-                        'Plasma glucose concentration after 2 hours in an oral glucose tolerance test',
+                    controller: crController,
+                    label: 'Cr',
+                    hint: 'Enter your Creatinine level',
                   ),
                 ),
               ],
@@ -98,16 +102,17 @@ class DiabetesScreenState extends State<DiabetesScreen> {
               children: [
                 Expanded(
                   child: _buildTextField(
-                    controller: bloodPressureController,
-                    label: 'Blood Pressure',
-                    hint: 'Diastolic blood pressure (mm Hg)',
+                    controller: hbA1cController,
+                    label: 'HbA1c',
+                    hint: 'Enter your HbA1c level',
                   ),
                 ),
+                const SizedBox(width: 8.0), // Space between fields
                 Expanded(
                   child: _buildTextField(
-                    controller: skinThicknessController,
-                    label: 'Skin Thickness',
-                    hint: 'Triceps skin fold thickness (mm)',
+                    controller: cholController,
+                    label: 'Chol',
+                    hint: 'Enter your Cholesterol level',
                   ),
                 ),
               ],
@@ -116,16 +121,17 @@ class DiabetesScreenState extends State<DiabetesScreen> {
               children: [
                 Expanded(
                   child: _buildTextField(
-                    controller: insulinController,
-                    label: 'Insulin',
-                    hint: '2-Hour serum insulin (mu U/ml)',
+                    controller: tgController,
+                    label: 'TG',
+                    hint: 'Enter your Triglycerides level',
                   ),
                 ),
+                const SizedBox(width: 8.0), // Space between fields
                 Expanded(
                   child: _buildTextField(
-                    controller: bmiController,
-                    label: 'BMI',
-                    hint: 'Body Mass Index (weight in kg/(height in m)^2)',
+                    controller: hdlController,
+                    label: 'HDL',
+                    hint: 'Enter your HDL level',
                   ),
                 ),
               ],
@@ -134,12 +140,25 @@ class DiabetesScreenState extends State<DiabetesScreen> {
               children: [
                 Expanded(
                   child: _buildTextField(
-                    controller: diabetesPedigreeFunctionController,
-                    label: 'Diabetes Pedigree Function',
-                    hint: 'Likelihood of diabetes based on family history',
+                    controller: ldlController,
+                    label: 'LDL',
+                    hint: 'Enter your LDL level',
+                  ),
+                ),
+                const SizedBox(width: 8.0), // Space between fields
+                Expanded(
+                  child: _buildTextField(
+                    controller: vldlController,
+                    label: 'VLDL',
+                    hint: 'Enter your VLDL level',
                   ),
                 ),
               ],
+            ),
+            _buildTextField(
+              controller: bmiController,
+              label: 'BMI',
+              hint: 'Enter your BMI',
             ),
             ElevatedButton(
               onPressed: () => _submitData(context),
@@ -230,8 +249,8 @@ class DiabetesScreenState extends State<DiabetesScreen> {
             children: [
               Text(
                 prediction == 0
-                    ? "You don't have heart disease."
-                    : "You have heart disease.",
+                    ? "You don't have diabetes."
+                    : "You have diabetes.",
                 style: TextStyle(
                   color: prediction == 0 ? Colors.green : Colors.red,
                   fontSize: 18,
@@ -258,19 +277,22 @@ class DiabetesScreenState extends State<DiabetesScreen> {
   }
 
   Future<void> _submitData(BuildContext context) async {
-    http.Response response = await ApiService().submitDiabetesBasicData(
+    http.Response response = await ApiService().submitDiabetesVIPData(
       context: context,
       nameController: nameController,
       ageController: ageController,
-      pregnanciesController: pregnanciesController,
-      glucoseController: glucoseController,
-      bloodPressureController: bloodPressureController,
-      skinThicknessController: skinThicknessController,
-      insulinController: insulinController,
+      ureaController: ureaController,
+      crController: crController,
+      hbA1cController: hbA1cController,
+      cholController: cholController,
+      tgController: tgController,
+      hdlController: hdlController,
+      ldlController: ldlController,
+      vldlController: vldlController,
       bmiController: bmiController,
-      diabetesPedigreeFunctionController: diabetesPedigreeFunctionController,
-      sexController: TextEditingController(text: sex),
+      sex: sex,
     );
+
     if (response.statusCode == 200) {
       final result = ApiService.getPredictionAndProbability(response);
       final prediction = result['prediction'];

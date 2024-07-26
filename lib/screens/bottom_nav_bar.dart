@@ -1,15 +1,19 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:jwt_auth/screens/diabetes.dart';
-import 'package:jwt_auth/screens/heart.dart';
-import 'package:jwt_auth/screens/history.dart';
-import 'package:jwt_auth/screens/hypertention.dart';
-import 'package:jwt_auth/screens/settings.dart';
-import 'package:jwt_auth/theme/colors.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:jwt_auth/screens/diabetes_vip.dart';
+import 'package:jwt_auth/screens/hypertention.dart';
+import 'package:jwt_auth/theme/colors.dart';
+import 'package:jwt_auth/widgets/inhert.dart';
+import 'diabetes.dart';
+import 'heart.dart';
+import 'history.dart';
+import 'settings.dart';
+// Import your VIP Diabetes screen
 
 class BottomNav extends StatefulWidget {
-  const BottomNav({super.key});
+  final Function(String) updateDataset;
+  const BottomNav({Key? key, required this.updateDataset}) : super(key: key);
 
   @override
   State<BottomNav> createState() => _BottomNavState();
@@ -17,23 +21,7 @@ class BottomNav extends StatefulWidget {
 
 class _BottomNavState extends State<BottomNav> {
   int _pageIndex = 2;
-  final PageController _pageController = PageController(initialPage: 1);
-
-  final List<Widget> _pages = [
-    const HeartScreen(),
-    const DiabetesScreen(),
-    const HistoryPage(),
-    const HypertensionScreen(),
-    const SettingsPage(),
-  ];
-
-  final List<String> _titles = [
-    'Heart',
-    'Diabetes',
-    'History',
-    'Hypertension',
-    'Settings',
-  ];
+  final PageController _pageController = PageController(initialPage: 2);
 
   @override
   void dispose() {
@@ -43,6 +31,27 @@ class _BottomNavState extends State<BottomNav> {
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider = SettingsProvider.of(context);
+    final String selectedDataset = settingsProvider?.selectedDataset ?? 'Basic';
+
+    final List<Widget> pages = [
+      const HeartScreen(),
+      selectedDataset == 'complex'
+          ? const DiabetesVIPScreen()
+          : const DiabetesScreen(),
+      const HistoryPage(),
+      const HypertensionScreen(),
+      SettingsPage(updateDataset: widget.updateDataset),
+    ];
+
+    final List<String> titles = [
+      'Heart',
+      selectedDataset == 'complex' ? 'Diabetes Complex' : 'Diabetes Basic',
+      'History',
+      'Hypertension',
+      'Settings',
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.secondaryColor,
       appBar: AppBar(
@@ -50,7 +59,7 @@ class _BottomNavState extends State<BottomNav> {
         centerTitle: true,
         backgroundColor: AppColors.primaryColor,
         title: Text(
-          _titles[_pageIndex],
+          titles[_pageIndex],
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
@@ -62,7 +71,7 @@ class _BottomNavState extends State<BottomNav> {
             _pageIndex = index;
           });
         },
-        children: _pages,
+        children: pages,
       ),
       bottomNavigationBar: CurvedNavigationBar(
         color: AppColors.primaryColor,

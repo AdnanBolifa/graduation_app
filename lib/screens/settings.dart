@@ -1,31 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_auth/services/auth_service.dart';
+import 'package:jwt_auth/widgets/inhert.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  final Function(String) updateDataset;
+  const SettingsPage({super.key, required this.updateDataset});
 
   @override
   SettingsPageState createState() => SettingsPageState();
 }
 
 class SettingsPageState extends State<SettingsPage> {
-  String _selectedDataset = 'Basic'; // Default dataset
+  String? _selectedDataset;
   bool _notificationsEnabled = true; // Example setting
   bool _darkMode = false; // Dark mode setting
   String _language = 'English'; // Language setting
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _selectedDataset ??=
+        SettingsProvider.of(context)?.selectedDataset ?? 'Basic';
+  }
+
+  void _selectDataset(String dataset) {
+    setState(() {
+      _selectedDataset = dataset;
+    });
+    widget.updateDataset(dataset);
+  }
 
   // Method to handle logout
   void _logout() {
     AuthService().logout();
     Navigator.pushNamed(context, '/login'); // Go back to the previous screen
-  }
-
-  // Method to handle dataset selection
-  void _selectDataset(String dataset) {
-    setState(() {
-      _selectedDataset = dataset;
-    });
-    // Save the selected dataset preference
   }
 
   // Method to toggle notifications
@@ -62,16 +70,16 @@ class SettingsPageState extends State<SettingsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: const Text('VIP Dataset'),
+                title: const Text('Complex Dataset'),
                 onTap: () {
-                  _selectDataset('Dataset 1');
+                  _selectDataset('complex');
                   Navigator.pop(context);
                 },
               ),
               ListTile(
                 title: const Text('Basic Dataset'),
                 onTap: () {
-                  _selectDataset('Dataset 2');
+                  _selectDataset('Basic');
                   Navigator.pop(context);
                 },
               ),
@@ -96,7 +104,7 @@ class SettingsPageState extends State<SettingsPage> {
                 'Select Diabetes Dataset',
                 style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
               ),
-              subtitle: Text('Current: $_selectedDataset'),
+              subtitle: Text('Current: ${_selectedDataset ?? 'Basic'}'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: _showDatasetBottomSheet,
             ),

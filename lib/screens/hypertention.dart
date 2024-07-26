@@ -1,11 +1,9 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:jwt_auth/theme/colors.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_auth/services/api_service.dart';
-import 'package:jwt_auth/theme/colors.dart';
 
 class HypertensionScreen extends StatefulWidget {
   const HypertensionScreen({Key? key}) : super(key: key);
@@ -54,11 +52,10 @@ class HypertensionScreenState extends State<HypertensionScreen> {
         child: Column(
           children: [
             _buildTextField(
-              controller: nameController,
-              label: 'Name',
-              hint: 'Enter your name',
-              isNumber: false,
-            ),
+                controller: nameController,
+                label: 'Name',
+                hint: "John Doe",
+                isNumber: false),
             Row(
               children: [
                 Expanded(
@@ -73,10 +70,33 @@ class HypertensionScreenState extends State<HypertensionScreen> {
                   ),
                 ),
                 Expanded(
-                  child: _buildTextField(
-                    controller: ageController,
-                    label: 'Age',
-                    hint: 'Enter your age',
+                  child:
+                      _buildTextField(controller: ageController, label: 'Age'),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildDropdownField(
+                    label: 'Blood Pressure Medication (BPMeds)',
+                    value: BPMeds,
+                    items: const [
+                      DropdownMenuItem(value: '0', child: Text('No')),
+                      DropdownMenuItem(value: '1', child: Text('Yes')),
+                    ],
+                    onChanged: (value) => setState(() => BPMeds = value),
+                  ),
+                ),
+                Expanded(
+                  child: _buildDropdownField(
+                    label: 'Diabetes',
+                    value: diabetes,
+                    items: const [
+                      DropdownMenuItem(value: '0', child: Text('No')),
+                      DropdownMenuItem(value: '1', child: Text('Yes')),
+                    ],
+                    onChanged: (value) => setState(() => diabetes = value),
                   ),
                 ),
               ],
@@ -101,35 +121,9 @@ class HypertensionScreenState extends State<HypertensionScreen> {
                     },
                   ),
                 ),
-                _buildTextField(
-                    controller: cigsPerDayController,
-                    label: 'Cigarettes Per Day',
-                    isVisible: currentSmoker == '1'),
-              ],
-            ),
-            Row(
-              children: [
                 Expanded(
-                  child: _buildDropdownField(
-                    label: 'Blood Pressure Medication',
-                    value: BPMeds,
-                    items: const [
-                      DropdownMenuItem(value: '0', child: Text('No')),
-                      DropdownMenuItem(value: '1', child: Text('Yes')),
-                    ],
-                    onChanged: (value) => setState(() => BPMeds = value),
-                  ),
-                ),
-                Expanded(
-                  child: _buildDropdownField(
-                    label: 'BP Meds',
-                    value: diabetes,
-                    items: const [
-                      DropdownMenuItem(value: '0', child: Text('No')),
-                      DropdownMenuItem(value: '1', child: Text('Yes')),
-                    ],
-                    onChanged: (value) => setState(() => diabetes = value),
-                  ),
+                  child: _buildTextField(
+                      controller: heartRateController, label: 'Heart Rate'),
                 ),
               ],
             ),
@@ -137,67 +131,39 @@ class HypertensionScreenState extends State<HypertensionScreen> {
               children: [
                 Expanded(
                   child: _buildTextField(
-                    controller: totCholController,
-                    label: 'Total Cholesterol',
-                    hint: 'Total cholesterol level',
-                  ),
+                      controller: BMIController,
+                      label: 'Body Mass Index (BMI)'),
                 ),
                 Expanded(
                   child: _buildTextField(
-                    controller: sysBPController,
-                    label: 'Sys BP',
-                    hint: 'Systolic blood pressure',
-                  ),
+                      controller: glucoseController, label: 'Glucose Level'),
                 ),
               ],
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    controller: diaBPController,
-                    label: 'Dia BP',
-                    hint: 'Diastolic blood pressure',
-                  ),
-                ),
-                Expanded(
-                  child: _buildTextField(
-                    controller: BMIController,
-                    label: 'BMI',
-                    hint: 'Body Mass Index',
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    controller: heartRateController,
-                    label: 'Heart Rate',
-                    hint: 'Heart rate',
-                  ),
-                ),
-                Expanded(
-                  child: _buildTextField(
-                    controller: glucoseController,
-                    label: 'Glucose',
-                    hint: 'Glucose level',
-                  ),
-                ),
-              ],
-            ),
+            _buildTextField(
+                controller: cigsPerDayController,
+                label: 'Cigarettes Per Day',
+                isVisible: currentSmoker == '1'),
+            _buildTextField(
+                controller: totCholController,
+                label: 'Total Cholesterol (totChol)'),
+            _buildTextField(
+                controller: sysBPController,
+                label: 'Systolic Blood Pressure (sysBP)'),
+            _buildTextField(
+                controller: diaBPController,
+                label: 'Diastolic Blood Pressure (diaBP)'),
             ElevatedButton(
               onPressed: () => _submitData(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryColor,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12), // <-- Radius
                 ),
               ),
               child: const Text('Submit'),
-            ),
+            )
           ],
         ),
       ),
@@ -268,17 +234,33 @@ class HypertensionScreenState extends State<HypertensionScreen> {
     );
   }
 
-  void _showPredictionDialog(BuildContext context, int prediction) {
+  void _showPredictionDialog(
+      BuildContext context, int prediction, double probabilityPositive) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Prediction'),
-          content: Text(
-            prediction == 0 ? "You don't have diabetes" : "You have diabetes",
-            style: TextStyle(
-              color: prediction == 0 ? Colors.green : Colors.red,
-            ),
+          title: const Text('Prediction Result'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                prediction == 0
+                    ? "You don't have heart disease."
+                    : "You have heart disease.",
+                style: TextStyle(
+                  color: prediction == 0 ? Colors.green : Colors.red,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                prediction == 0
+                    ? "Probability: ${(100 - probabilityPositive).toStringAsFixed(2)}%"
+                    : "Probability: ${probabilityPositive.toStringAsFixed(2)}%",
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
@@ -294,7 +276,7 @@ class HypertensionScreenState extends State<HypertensionScreen> {
   }
 
   Future<void> _submitData(BuildContext context) async {
-    http.Response response = await ApiService.submitHypertensionData(
+    http.Response response = await ApiService().submitHypertensionData(
       context: context,
       nameController: nameController,
       ageController: ageController,
@@ -311,8 +293,10 @@ class HypertensionScreenState extends State<HypertensionScreen> {
       bmiController: BMIController,
     );
     if (response.statusCode == 200) {
-      int prediction = ApiService.getPrediction(response);
-      _showPredictionDialog(context, prediction);
+      final result = ApiService.getPredictionAndProbability(response);
+      final prediction = result['prediction'];
+      final probabilityPositive = result['probability_positive'];
+      _showPredictionDialog(context, prediction, probabilityPositive);
     } else {
       ApiService.handleError(response);
     }

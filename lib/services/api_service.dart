@@ -10,7 +10,7 @@ import 'package:jwt_auth/screens/login.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 
 class ApiService {
-  static Future<http.Response> submitHeartData(
+  Future<http.Response> submitHeartData(
     BuildContext context,
     TextEditingController sexController,
     TextEditingController patientNameController,
@@ -45,24 +45,54 @@ class ApiService {
       heartRate: int.parse(heartRateController.text),
       glucose: int.parse(glucoseController.text),
     );
-    final accessToken = await AuthService().getAccessToken();
-    final Uri url = Uri.parse(APIConfig.predictUrl);
 
     final Map<String, dynamic> requestBody = data.toJson();
     requestBody['prediction_type'] = 'heart';
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(requestBody),
+
+    final response = _performPostRequest(APIConfig.predictUrl, requestBody);
+    return response;
+  }
+
+  Future<http.Response> submitDiabetesVIPData({
+    required BuildContext context,
+    required TextEditingController nameController,
+    required TextEditingController ageController,
+    required TextEditingController ureaController,
+    required TextEditingController crController,
+    required TextEditingController hbA1cController,
+    required TextEditingController cholController,
+    required TextEditingController tgController,
+    required TextEditingController hdlController,
+    required TextEditingController ldlController,
+    required TextEditingController vldlController,
+    required TextEditingController bmiController,
+    required String? sex,
+  }) async {
+    final DiabetesVip data = DiabetesVip(
+      name: nameController.text,
+      age: int.parse(ageController.text),
+      urea: double.parse(ureaController.text),
+      cr: double.parse(crController.text),
+      hbA1c: double.parse(hbA1cController.text),
+      chol: double.parse(cholController.text),
+      tg: double.parse(tgController.text),
+      hdl: double.parse(hdlController.text),
+      ldl: double.parse(ldlController.text),
+      vldl: double.parse(vldlController.text),
+      bmi: double.parse(bmiController.text),
+      sex: int.parse(sex ?? '0'), // assuming '0' for female if sex is null
     );
+
+    final Map<String, dynamic> requestBody = data.toJson();
+    requestBody['prediction_type'] = 'diabetes_vip';
+
+    final response = await ApiService()
+        ._performPostRequest(APIConfig.predictUrl, requestBody);
 
     return response;
   }
 
-  static Future<http.Response> submitDiabetesBasicData({
+  Future<http.Response> submitDiabetesBasicData({
     required BuildContext context,
     required TextEditingController nameController,
     required TextEditingController ageController,
@@ -88,24 +118,16 @@ class ApiService {
       sex: int.parse(sexController.text),
       age: int.parse(ageController.text),
     );
-    final accessToken = await AuthService().getAccessToken();
-    final Uri url = Uri.parse(APIConfig.predictUrl);
 
     final Map<String, dynamic> requestBody = data.toJson();
     requestBody['prediction_type'] = 'diabetes';
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(requestBody),
-    );
+
+    final response = _performPostRequest(APIConfig.predictUrl, requestBody);
 
     return response;
   }
 
-  static Future<http.Response> submitHypertensionData({
+  Future<http.Response> submitHypertensionData({
     required BuildContext context,
     required TextEditingController nameController,
     required TextEditingController ageController,
@@ -137,27 +159,23 @@ class ApiService {
       glucose: int.parse(glucoseController.text),
     );
 
-    final accessToken = await AuthService().getAccessToken();
-    final Uri url = Uri.parse(APIConfig.predictUrl);
-
     final Map<String, dynamic> requestBody = data.toJson();
     requestBody['prediction_type'] = 'hypertension';
 
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(requestBody),
-    );
+    final response = _performPostRequest(APIConfig.predictUrl, requestBody);
 
     return response;
   }
 
-  static int getPrediction(http.Response response) {
+  static Map<String, dynamic> getPredictionAndProbability(
+      http.Response response) {
     Map<String, dynamic> responseBody = jsonDecode(response.body);
-    return responseBody['prediction'];
+    int prediction = responseBody['prediction'];
+    double probabilityPositive = responseBody['probability_positive'];
+    return {
+      'prediction': prediction,
+      'probability_positive': probabilityPositive,
+    };
   }
 
   Future<List<History>?> getHistory() async {
@@ -187,17 +205,31 @@ class ApiService {
     };
 
     try {
-      final response =
-          await _performRequest(APIConfig.feedbackUrl, 'POST', payload);
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        // Handle successful response
-        debugPrint('Prediction result sent successfully');
-      } else {
-        // Handle non-2xx status codes if needed
-        debugPrint('Failed to send prediction result: ${response.statusCode}');
-      }
+      await _performPostRequest(APIConfig.feedbackUrl, payload);
     } catch (e) {
       debugPrint('Error sending prediction result: $e');
+      // Throw an exception to indicate that something went wrong
+      throw Exception('Failed to send prediction result');
+    }
+  }
+
+  Future<bool> isDoctor() async {
+    try {
+      final response = await _performGetRequest(APIConfig.isDoctorUrl);
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseBody = jsonDecode(response.body);
+        return responseBody['is_doctor'] as bool;
+      } else {
+        debugPrint(
+            'Failed to check if the user is a doctor. Status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Error checking if the user is a doctor: $e');
+      return false;
     }
   }
 
@@ -206,12 +238,8 @@ class ApiService {
     return _performRequest(url, 'GET', null);
   }
 
-  Future<void> _performPostRequest(String url, dynamic body) async {
-    await _performRequest(url, 'POST', body);
-  }
-
-  Future<void> _performPutRequest(String url, dynamic body) async {
-    await _performRequest(url, 'PUT', body);
+  Future<http.Response> _performPostRequest(String url, dynamic body) async {
+    return _performRequest(url, 'POST', body);
   }
 
   //helper functions

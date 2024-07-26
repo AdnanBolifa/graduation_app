@@ -27,7 +27,7 @@ class AuthService {
       throw Exception('Failed to log in: ${response.statusCode}');
     }
   }
-
+  
   Future<void> storeTokens(String apiResponse) async {
     final Map<String, dynamic> tokens = jsonDecode(apiResponse);
     final String? refreshToken = tokens['refresh'];
