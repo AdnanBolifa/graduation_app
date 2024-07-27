@@ -6,7 +6,7 @@ import 'package:jwt_auth/data/api_config.dart';
 import 'package:jwt_auth/data/features_config.dart';
 import 'package:jwt_auth/data/history_config.dart';
 import 'package:jwt_auth/main.dart';
-import 'package:jwt_auth/screens/login.dart';
+import 'package:jwt_auth/screens/Auth/login.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 
 class ApiService {

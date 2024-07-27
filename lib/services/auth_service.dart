@@ -27,7 +27,35 @@ class AuthService {
       throw Exception('Failed to log in: ${response.statusCode}');
     }
   }
-  
+
+  Future<String> signup(String firstName, String lastName, String username,
+      String email, String password, bool isDoctor) async {
+    if (email.isEmpty || password.isEmpty) {
+      Fluttertoast.showToast(msg: 'بيانات فارغة!');
+      throw ArgumentError('Email and password must not be empty');
+    }
+    final response = await http.post(
+      Uri.parse(APIConfig.loginUrl),
+      body: {
+        "email": email,
+        "username": username,
+        "password": password,
+        "first_name": firstName,
+        "last_name": lastName,
+        "isDoctor": isDoctor.toString(), // Convert bool to String
+      },
+    );
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return response.body;
+    } else if (response.statusCode == 401) {
+      Fluttertoast.showToast(msg: 'بيانات خاطئة!');
+      throw Exception('Failed to log in: ${response.statusCode}');
+    } else {
+      Fluttertoast.showToast(msg: 'حدث خطأ ما!');
+      throw Exception('Failed to log in: ${response.statusCode}');
+    }
+  }
+
   Future<void> storeTokens(String apiResponse) async {
     final Map<String, dynamic> tokens = jsonDecode(apiResponse);
     final String? refreshToken = tokens['refresh'];

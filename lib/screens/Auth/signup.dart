@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_auth/services/auth_service.dart';
+import 'package:jwt_auth/theme/colors.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -19,7 +21,7 @@ class _SignUpPageState extends State<SignUpPage> {
     required TextEditingController controller,
     required String label,
     bool isVisible = true,
-    bool isNumber = true,
+    bool isNumber = false,
     bool isPassword = false,
     String? hint,
   }) {
@@ -121,18 +123,28 @@ class _SignUpPageState extends State<SignUpPage> {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    // Handle sign-up logic here
-                    final signUpData = {
-                      "email": _emailController.text,
-                      "username": _usernameController.text,
-                      "password": _passwordController.text,
-                      "first_name": _firstNameController.text,
-                      "last_name": _lastNameController.text,
-                      "isDoctor": _isDoctor,
-                    };
-                    print(signUpData);
+                    AuthService().signup(
+                        _firstNameController.text,
+                        _lastNameController.text,
+                        _usernameController.text,
+                        _emailController.text,
+                        _passwordController.text,
+                        _isDoctor);
+                    Navigator.pushNamed(context, '/login');
                   },
-                  child: const Text('Sign Up'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // <-- Radius
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                  ),
+                  child: const Text(
+                    'sign up',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
             ],

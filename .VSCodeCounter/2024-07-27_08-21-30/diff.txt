@@ -1,0 +1,43 @@
+Date : 2024-07-27 08:21:30
+Directory : d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib
+Total : 14 files,  1973 codes, 18 comments, 107 blanks, all 2098 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Dart     |         14 |      1,973 |         18 |        107 |      2,098 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                         | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                            |         14 |      1,973 |         18 |        107 |      2,098 |
+| . (Files)                                                                                    |          1 |         14 |          0 |          3 |         17 |
+| data                                                                                         |          2 |        130 |          0 |          8 |        138 |
+| screens                                                                                      |          9 |      1,704 |         19 |         78 |      1,801 |
+| services                                                                                     |          1 |        109 |         -1 |         13 |        121 |
+| widgets                                                                                      |          1 |         16 |          0 |          5 |         21 |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                     | language | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\data\api_config.dart        | Dart     |          1 |          0 |          0 |          1 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\data\features_config.dart   | Dart     |        129 |          0 |          8 |        137 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\main.dart                   | Dart     |         14 |          0 |          3 |         17 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\bottom_nav_bar.dart | Dart     |        102 |          1 |          9 |        112 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\diabetes.dart       | Dart     |        366 |          1 |         15 |        382 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\diabetes_vip.dart   | Dart     |        386 |          1 |         17 |        404 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\heart.dart          | Dart     |        427 |          1 |         15 |        443 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\history.dart        | Dart     |         -4 |          0 |          0 |         -4 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\home.dart           | Dart     |       -404 |         -3 |        -19 |       -426 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\hypertention.dart   | Dart     |        398 |          1 |         16 |        415 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\settings.dart       | Dart     |        193 |         16 |         12 |        221 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\screens\test.dart           | Dart     |        240 |          1 |         13 |        254 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\services\api_service.dart   | Dart     |        109 |         -1 |         13 |        121 |
+| d:\Dev\Projects\Flutter\vscode\graduation_app\graduation_app\lib\widgets\inhert.dart         | Dart     |         16 |          0 |          5 |         21 |
+| Total                                                                                        |          |      1,973 |         18 |        107 |      2,098 |
++----------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
