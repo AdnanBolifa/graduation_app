@@ -28,14 +28,14 @@ class AuthService {
     }
   }
 
-  Future<String> signup(String firstName, String lastName, String username,
+  Future<int> signup(String firstName, String lastName, String username,
       String email, String password, bool isDoctor) async {
     if (email.isEmpty || password.isEmpty) {
       Fluttertoast.showToast(msg: 'بيانات فارغة!');
       throw ArgumentError('Email and password must not be empty');
     }
     final response = await http.post(
-      Uri.parse(APIConfig.loginUrl),
+      Uri.parse(APIConfig.signupUrl),
       body: {
         "email": email,
         "username": username,
@@ -46,9 +46,10 @@ class AuthService {
       },
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
-      return response.body;
-    } else if (response.statusCode == 401) {
-      Fluttertoast.showToast(msg: 'بيانات خاطئة!');
+      Fluttertoast.showToast(msg: 'تم انشاء الحساب');
+      return response.statusCode;
+    } else if (response.statusCode == 401 || response.statusCode == 400) {
+      Fluttertoast.showToast(msg: 'بيانات خاطئة او متكررة');
       throw Exception('Failed to log in: ${response.statusCode}');
     } else {
       Fluttertoast.showToast(msg: 'حدث خطأ ما!');

@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_auth/services/auth_service.dart';
 import 'package:jwt_auth/theme/colors.dart';
 
@@ -122,15 +125,18 @@ class _SignUpPageState extends State<SignUpPage> {
               const SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    AuthService().signup(
+                  onPressed: () async {
+                    final res = await AuthService().signup(
                         _firstNameController.text,
                         _lastNameController.text,
                         _usernameController.text,
                         _emailController.text,
                         _passwordController.text,
                         _isDoctor);
-                    Navigator.pushNamed(context, '/login');
+                    if (res == 201 || res == 200) {
+                      Fluttertoast.showToast(msg: 'تم التسجيل بنجاح');
+                      Navigator.pushNamed(context, '/login');
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
